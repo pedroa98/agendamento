@@ -17,7 +17,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     return;
   }
 
-  // Modal elements
   const modalMarcar = document.getElementById('modalMarcar');
   const textoData = document.getElementById('textoData');
   const confirmarMarcar = document.getElementById('confirmarMarcar');
@@ -28,20 +27,71 @@ document.addEventListener('DOMContentLoaded', async () => {
   const confirmarCancelar = document.getElementById('confirmarCancelar');
   const fecharCancelar = document.getElementById('fecharCancelar');
 
+  // 🔹 Modal de detalhes
+  const modalDetalhes = document.createElement('div');
+  modalDetalhes.id = "modalDetalhes";
+  modalDetalhes.className = "modal";
+  modalDetalhes.innerHTML = `
+    <div class="modal-content">
+      <h3>Detalhes da Consulta</h3>
+      <p id="detalheNome"></p>
+      <p id="detalheEspecialidade"></p>
+      <button id="btnApagarConsulta" class="btn btn-green">🗑️ Apagar Consulta</button>
+      <button id="fecharDetalhes" class="btn btn-blue">Fechar</button>
+    </div>
+  `;
+  document.body.appendChild(modalDetalhes);
+
+  const detalheNome = modalDetalhes.querySelector("#detalheNome");
+  const detalheEsp = modalDetalhes.querySelector("#detalheEspecialidade");
+  const fecharDetalhes = modalDetalhes.querySelector("#fecharDetalhes");
+  const btnApagarConsulta = modalDetalhes.querySelector("#btnApagarConsulta");
+
+  fecharDetalhes.addEventListener('click', () => modalDetalhes.style.display = "none");
+
   let selectedSlot = null;
   let selectedAppointment = null;
   let calendar = null;
   let prof = null;
   let clientProfile = null;
-  let relation = null; // ProfessionalClientRelation
+  let relation = null;
+  let currentAppointments = [];
+
+  // 🔔 Cria uma notificação para o profissional
+  async function criarNotificacao(professional, clientProfile, mensagem) {
+    try {
+      const Notificacao = Parse.Object.extend('Notificacao');
+      const notif = new Notificacao();
+      notif.set('professional', professional);
+      notif.set('client', clientProfile);
+      notif.set('message', mensagem);
+      notif.set('status', 'nova');
+      await notif.save();
+      console.log('Notificação criada:', mensagem);
+    } catch (err) {
+      console.error('Erro ao criar notificação:', err);
+    }
+  }
+
+  // 🔹 Nome do cliente (para notificações)
+  function nomeDoCliente() {
+    try {
+      return (
+        clientProfile?.get?.('name') ||
+        clientProfile?.name ||
+        user?.get?.('name') ||
+        'Cliente'
+      );
+    } catch {
+      return 'Cliente';
+    }
+  }
 
   try {
-    // Load professional profile
     const Prof = Parse.Object.extend('ProfessionalProfile');
     const profQ = new Parse.Query(Prof);
     prof = await profQ.get(profId);
 
-    // Render profile header
     function photoUrlFor(obj) {
       try {
         if (obj && typeof obj.get === 'function') {
@@ -65,13 +115,11 @@ document.addEventListener('DOMContentLoaded', async () => {
       <p>📍 ${prof.get('address') || 'Endereço não informado'}</p>
     `;
 
-    // Determine client profile
     const ClientProfile = Parse.Object.extend('ClientProfile');
     const clientQ = new Parse.Query(ClientProfile);
     clientQ.equalTo('user', user);
     clientProfile = await clientQ.first();
 
-    // If client has profile, check relation
     if (clientProfile) {
       const Relation = Parse.Object.extend('ProfessionalClientRelation');
       const relQ = new Parse.Query(Relation);
@@ -80,13 +128,12 @@ document.addEventListener('DOMContentLoaded', async () => {
       relation = await relQ.first();
     }
 
-    // Show action buttons depending on state
     const actions = document.createElement('div');
     actions.style.marginTop = '12px';
 
     if (!clientProfile) {
       const btn = document.createElement('button');
-      btn.className = 'btn';
+      btn.className = 'btn btn-blue';
       btn.textContent = 'Cadastrar Perfil';
       btn.addEventListener('click', () => window.location.href = 'editar-perfil-cliente.html');
       actions.appendChild(btn);
@@ -94,7 +141,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       mensagemEl.textContent = 'Você precisa criar seu perfil para solicitar vínculo ou agendar.';
     } else if (!relation) {
       const btn = document.createElement('button');
-      btn.className = 'btn';
+      btn.className = 'btn btn-green';
       btn.textContent = 'Solicitar Vínculo';
       btn.addEventListener('click', async () => {
         const texto = prompt('Mensagem para o profissional (opcional):', 'Olá, gostaria de me vincular.');
@@ -110,11 +157,9 @@ document.addEventListener('DOMContentLoaded', async () => {
       perfilEl.appendChild(actions);
       mensagemEl.textContent = 'Você pode solicitar vínculo com este profissional.';
     } else {
-      // Client is linked — show agenda and booking options
       mensagemEl.textContent = '';
       perfilEl.appendChild(actions);
 
-      // Initialize FullCalendar
       if (window.FullCalendar) initCalendar();
       else {
         const s = document.createElement('script');
@@ -130,8 +175,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     return;
   }
 
-  // Calendar initialization + event handlers
   async function initCalendar() {
+    currentAppointments = await carregarEventos();
+
     calendar = new FullCalendar.Calendar(calendarEl, {
       initialView: 'timeGridWeek',
       locale: 'pt-br',
@@ -139,20 +185,30 @@ document.addEventListener('DOMContentLoaded', async () => {
       selectable: true,
       selectMirror: true,
       height: 'auto',
+      nowIndicator: true,
       headerToolbar: {
         left: 'prev,next today',
         center: 'title',
         right: 'dayGridMonth,timeGridWeek,timeGridDay'
       },
+      validRange: { start: new Date() },
+      selectAllow: (selectInfo) => {
+        // Bloqueia horários passados e sobrepostos
+        return (
+          selectInfo.start >= new Date() &&
+          !currentAppointments.some(ev =>
+            (selectInfo.start < ev.end && selectInfo.end > ev.start)
+          )
+        );
+      },
       select: onSelectSlot,
       eventClick: onEventClick,
-      events: await carregarEventos()
+      events: currentAppointments
     });
 
     calendar.render();
   }
 
-  // Load appointments for this professional
   async function carregarEventos() {
     const Appointment = Parse.Object.extend('Appointment');
     const q = new Parse.Query(Appointment);
@@ -160,13 +216,19 @@ document.addEventListener('DOMContentLoaded', async () => {
     q.include('client');
     q.ascending('date');
     const results = await q.find();
-    return results.map(a => ({
-      id: a.id,
-      title: `Consulta - ${a.get('client') ? (a.get('client').get ? a.get('client').get('name') : a.get('client').name) : 'Cliente'}`,
-      start: a.get('date'),
-      end: a.get('endDate') || new Date(new Date(a.get('date')).getTime() + 30*60000),
-      extendedProps: { appointmentObj: a }
-    }));
+    return results.map(a => {
+      const cliente = a.get('client');
+      const isMeu = cliente && cliente.id === clientProfile?.id;
+      return {
+        id: a.id,
+        title: `Consulta - ${cliente ? (cliente.get ? cliente.get('name') : cliente.name) : 'Cliente'}`,
+        start: a.get('date'),
+        end: a.get('endDate') || new Date(new Date(a.get('date')).getTime() + 30 * 60000),
+        backgroundColor: isMeu ? '#2ecc71' : '#3498db', // 🟩 verde se é do cliente, 🟦 azul se é de outro
+        borderColor: isMeu ? '#27ae60' : '#2980b9',
+        extendedProps: { appointmentObj: a }
+      };
+    });
   }
 
   function onSelectSlot(selectionInfo) {
@@ -176,17 +238,22 @@ document.addEventListener('DOMContentLoaded', async () => {
       return;
     }
 
-    // Check available credits
-    const pagas = relation.get('sessionsPaid') || 0;
-    const usadas = relation.get('sessionsUsed') || 0;
-    const disponiveis = pagas - usadas;
-    if (disponiveis <= 0) {
-      alert('Você não possui créditos disponíveis. Peça ao profissional para adicionar créditos.');
+    const now = new Date();
+    if (selectionInfo.start < now) {
+      alert('Não é possível marcar consultas em horários passados.');
       calendar.unselect();
       return;
     }
 
-    // Check overlap with existing events client-side — FullCalendar select won't pick occupied ranges
+    const pagas = relation.get('sessionsPaid') || 0;
+    const usadas = relation.get('sessionsUsed') || 0;
+    const disponiveis = pagas - usadas;
+    if (disponiveis <= 0) {
+      alert('Você não possui créditos disponíveis.');
+      calendar.unselect();
+      return;
+    }
+
     selectedSlot = selectionInfo;
     const start = selectionInfo.start;
     const end = selectionInfo.end;
@@ -197,7 +264,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   confirmarMarcar.addEventListener('click', async () => {
     if (!selectedSlot) return;
     try {
-      // Create Appointment
       const Appointment = Parse.Object.extend('Appointment');
       const a = new Appointment();
       a.set('professional', prof);
@@ -206,15 +272,20 @@ document.addEventListener('DOMContentLoaded', async () => {
       a.set('endDate', selectedSlot.end);
       await a.save();
 
-      // decrement credit (sessionsPaid - sessionsUsed)
+      const dataFmt = new Date(selectedSlot.start).toLocaleString('pt-BR');
+      await criarNotificacao(
+        prof,
+        clientProfile,
+        `${nomeDoCliente()} marcou uma consulta para ${dataFmt}.`
+      );
+
       relation.increment('sessionsUsed', 1);
       await relation.save();
 
       modalMarcar.style.display = 'none';
       selectedSlot = null;
-      // refresh calendar
-      calendar.refetchEvents();
       alert('Consulta agendada com sucesso!');
+      location.reload();
     } catch (err) {
       console.error('Erro criando appointment', err);
       alert('Erro ao agendar. Tente novamente.');
@@ -227,45 +298,52 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
 
   function onEventClick(info) {
-    const ev = info.event;
-    selectedAppointment = ev.extendedProps && ev.extendedProps.appointmentObj;
+    selectedAppointment = info.event.extendedProps.appointmentObj;
     if (!selectedAppointment) return;
 
-    const start = new Date(ev.start);
-    textoCancelar.textContent = `Deseja cancelar a consulta marcada para ${start.toLocaleString()}?`;
-    modalCancelar.style.display = 'flex';
+    detalheNome.textContent = `Profissional: ${prof.get('name')}`;
+    detalheEsp.textContent = `Especialidade: ${prof.get('specialty') || 'Não informada'}`;
+    modalDetalhes.style.display = 'flex';
   }
 
-  confirmarCancelar.addEventListener('click', async () => {
+  btnApagarConsulta.addEventListener('click', async () => {
     if (!selectedAppointment) return;
+
     try {
-      const appt = await (new Parse.Query('Appointment')).get(selectedAppointment.id);
+      const appt = await new Parse.Query('Appointment').get(selectedAppointment.id);
+      const clientObj = appt.get('client');
+
+      if (!clientObj || clientObj.id !== clientProfile.id) {
+        alert('Você não pode apagar consultas que não são suas.');
+        return;
+      }
+
+      if (!confirm('Tem certeza que deseja apagar esta consulta?')) return;
+
       const apptDate = new Date(appt.get('date'));
       const now = new Date();
       const diffMs = apptDate - now;
-      const hours = diffMs / (1000*60*60);
+      const hours = diffMs / (1000 * 60 * 60);
 
-      // If >=72 hours, refund credit (decrement sessionsUsed)
       if (hours >= 72) {
-        // decrement sessionsUsed
         relation.increment('sessionsUsed', -1);
         await relation.save();
       }
 
       await appt.destroy();
-      modalCancelar.style.display = 'none';
-      selectedAppointment = null;
-      calendar.refetchEvents();
-      alert('Consulta cancelada.');
+
+      const dataFmt = apptDate.toLocaleString('pt-BR');
+      await criarNotificacao(
+        prof,
+        clientProfile,
+        `${nomeDoCliente()} cancelou a consulta agendada para ${dataFmt}.`
+      );
+
+      alert('Consulta apagada com sucesso.');
+      location.reload();
     } catch (err) {
-      console.error('Erro cancelando consulta', err);
-      alert('Erro ao cancelar.');
+      console.error('Erro ao apagar consulta', err);
+      alert('Erro ao apagar consulta.');
     }
   });
-
-  fecharCancelar.addEventListener('click', () => {
-    modalCancelar.style.display = 'none';
-    selectedAppointment = null;
-  });
-
 });

@@ -9,7 +9,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const calendarEl = document.getElementById("calendar");
   let selectedEvent = null;
 
-  // Load this professional's ProfessionalProfile (relations and appointments use it)
+  // Buscar perfil profissional vinculado ao usuário
   const profQuery = new Parse.Query("ProfessionalProfile");
   profQuery.equalTo("user", user);
   const profObj = await profQuery.first();
@@ -18,6 +18,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     return;
   }
 
+  // Inicializar calendário
   const calendar = new FullCalendar.Calendar(calendarEl, {
     initialView: "timeGridWeek",
     locale: "pt-br",
@@ -41,23 +42,20 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   calendar.render();
 
-  // Load existing working hours and blocked dates from profObj
-  let workingHours = profObj.get('workingHours') || {}; // { mon: ['09:00','17:00'], ... }
-  let blockedDates = profObj.get('blockedDates') || []; // ['2025-12-25', ...]
+  // Horários e datas bloqueadas
+  let workingHours = profObj.get('workingHours') || {};
+  let blockedDates = profObj.get('blockedDates') || [];
 
-  // Wire schedule/blocked buttons
   document.getElementById('btnSchedule').addEventListener('click', () => openScheduleModal());
   document.getElementById('btnBlocked').addEventListener('click', () => openBlockedModal());
 
   function openScheduleModal() {
-    // populate inputs
     const days = ['mon','tue','wed','thu','fri','sat','sun'];
+    const ids = ['monStart','monEnd','tueStart','tueEnd','wedStart','wedEnd','thuStart','thuEnd','friStart','friEnd','satStart','satEnd','sunStart','sunEnd'];
     days.forEach((d, i) => {
-      const start = (workingHours[d] && workingHours[d][0]) || '';
-      const end = (workingHours[d] && workingHours[d][1]) || '';
-      const ids = ['monStart','monEnd','tueStart','tueEnd','wedStart','wedEnd','thuStart','thuEnd','friStart','friEnd','satStart','satEnd','sunStart','sunEnd'];
-      document.getElementById(ids[i*2]).value = start;
-      document.getElementById(ids[i*2+1]).value = end;
+      const wh = workingHours[d] || ['', ''];
+      document.getElementById(ids[i*2]).value = wh[0];
+      document.getElementById(ids[i*2+1]).value = wh[1];
     });
     document.getElementById('modalSchedule').style.display = 'flex';
   }
@@ -82,14 +80,15 @@ document.addEventListener("DOMContentLoaded", async () => {
     alert('Horários salvos.');
   });
 
-  // Blocked dates modal
   function openBlockedModal(){
     const list = document.getElementById('blockedList');
     list.innerHTML = '';
     blockedDates.forEach(d => {
       const li = document.createElement('li');
       li.textContent = d + ' ';
-      const btn = document.createElement('button'); btn.textContent = 'Remover'; btn.className='btn';
+      const btn = document.createElement('button'); 
+      btn.textContent = 'Remover'; 
+      btn.className='btn';
       btn.addEventListener('click', async () => {
         blockedDates = blockedDates.filter(x => x !== d);
         profObj.set('blockedDates', blockedDates);
@@ -115,28 +114,23 @@ document.addEventListener("DOMContentLoaded", async () => {
     openBlockedModal();
   });
 
-  // Helper to check if a date is blocked or outside working hours
+  // === Função auxiliar ===
   function isDateBlocked(start,end){
-    // date-only blocked
     const yyyy = start.getFullYear();
     const mm = String(start.getMonth()+1).padStart(2,'0');
     const dd = String(start.getDate()).padStart(2,'0');
     const key = `${yyyy}-${mm}-${dd}`;
     if (blockedDates.includes(key)) return true;
 
-    // Check weekly working hours
     const dayNames = ['sun','mon','tue','wed','thu','fri','sat'];
     const day = dayNames[start.getDay()];
     const wh = workingHours[day];
-    if (!wh) return true; // no hours defined => not working
-    // wh = ['09:00','17:00']
+    if (!wh) return true;
     const startHM = `${String(start.getHours()).padStart(2,'0')}:${String(start.getMinutes()).padStart(2,'0')}`;
     const endHM = `${String(end.getHours()).padStart(2,'0')}:${String(end.getMinutes()).padStart(2,'0')}`;
     return !(startHM >= wh[0] && endHM <= wh[1]);
   }
 
-
-  // === FUNÇÃO PARA CARREGAR CONSULTAS ===
   async function carregarConsultas() {
     const Appointment = Parse.Object.extend("Appointment");
     const query = new Parse.Query(Appointment);
@@ -158,34 +152,30 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
   }
 
-  // === ABRIR MODAL ADICIONAR ===
+  // === Adicionar Consulta ===
   document.getElementById("btnAdd").addEventListener("click", async () => {
     const select = document.getElementById("clienteSelect");
     select.innerHTML = "";
 
     const Relation = Parse.Object.extend("ProfessionalClientRelation");
-    // Build OR query: either status == 'ativo' OR sessionsPaid > 0 (we'll refine after fetching)
-  const q1 = new Parse.Query(Relation);
-  q1.equalTo("professional", profObj);
+    const q1 = new Parse.Query(Relation);
+    q1.equalTo("professional", profObj);
     q1.equalTo("status", "ativo");
 
-  const q2 = new Parse.Query(Relation);
-  q2.equalTo("professional", profObj);
+    const q2 = new Parse.Query(Relation);
+    q2.equalTo("professional", profObj);
     q2.greaterThan("sessionsPaid", 0);
 
     const qOr = Parse.Query.or(q1, q2);
     qOr.include("client");
     const relsRaw = await qOr.find();
 
-    // Filter to relations that are actually usable: either status ativo OR have available credits
     const rels = relsRaw.filter(r => {
-      try {
-        const status = r.get("status");
-        if (status === "ativo") return true;
-        const pagas = r.get("sessionsPaid") || 0;
-        const usadas = r.get("sessionsUsed") || 0;
-        return (pagas - usadas) > 0;
-      } catch (e) { return false; }
+      const status = r.get("status");
+      if (status === "ativo") return true;
+      const pagas = r.get("sessionsPaid") || 0;
+      const usadas = r.get("sessionsUsed") || 0;
+      return (pagas - usadas) > 0;
     });
 
     if (!rels.length) {
@@ -207,7 +197,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     document.getElementById("modalAdd").style.display = "flex";
   });
 
-  // === SALVAR CONSULTA ===
+  // === Salvar Consulta ===
   document.getElementById("salvarConsulta").addEventListener("click", async () => {
     const clienteId = document.getElementById("clienteSelect").value;
     const dataStr = document.getElementById("dataConsulta").value;
@@ -215,54 +205,43 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     if (!clienteId || !dataStr) return alert("Preencha todos os campos.");
 
-  const Cliente = Parse.Object.extend("ClientProfile");
-  const cli = await new Parse.Query(Cliente).get(clienteId);
-
-  const Appointment = Parse.Object.extend("Appointment");
-  const ap = new Appointment();
-  // save professional pointer as ProfessionalProfile (profObj)
-  ap.set("professional", profObj);
-  ap.set("client", cli);
     const start = new Date(dataStr);
-    const end = new Date(start.getTime() + 30 * 60 * 1000); // default 30 minutes
-    // Enforce blocked dates and working hours
-    if (typeof isDateBlocked === 'function') {
-      if (isDateBlocked(start,end)) {
-        return alert('O horário selecionado está fora do seu horário de trabalho ou corresponde a uma data bloqueada.');
-      }
+    const now = new Date();
+    if (start < now) return alert("Não é possível agendar consultas em horários passados.");
+
+    const end = new Date(start.getTime() + 30 * 60 * 1000);
+
+    // Verifica bloqueio e horário de trabalho
+    if (isDateBlocked(start,end)) {
+      return alert('O horário selecionado está fora do horário de trabalho ou é uma data bloqueada.');
     }
 
-    // Check for overlapping appointments for this professional
-    try {
-      const Appointment = Parse.Object.extend("Appointment");
-      const overlapQ = new Parse.Query(Appointment);
-      overlapQ.equalTo("professional", profObj);
-      // existing.start < newEnd
-      overlapQ.lessThan("date", end);
-      // existing.end > newStart
-      overlapQ.greaterThan("endDate", start);
-      const overlap = await overlapQ.first();
-      if (overlap) {
-        return alert('Já existe uma consulta neste horário. Escolha outro horário.');
-      }
-      // Also check exact start matches (in case endDate missing on some records)
-      const exactQ = new Parse.Query(Appointment);
-      exactQ.equalTo('professional', profObj);
-      exactQ.equalTo('date', start);
-      const exact = await exactQ.first();
-      if (exact) return alert('Já existe uma consulta iniciando exatamente neste horário.');
-    } catch (e) {
-      console.warn('Erro ao verificar sobreposição de consultas:', e);
-    }
-  ap.set("date", start);
-  ap.set("endDate", end);
-  ap.set("status", "agendada");
-  ap.set("createdBy", "profissional");
-  await ap.save();
+    // Verifica conflito de horários
+    const Appointment = Parse.Object.extend("Appointment");
+    const overlapQ = new Parse.Query(Appointment);
+    overlapQ.equalTo("professional", profObj);
+    overlapQ.lessThan("date", end);
+    overlapQ.greaterThan("endDate", start);
+    const overlap = await overlapQ.first();
+    if (overlap) return alert('Já existe uma consulta neste horário.');
 
+    // Criação do objeto
+    const Cliente = Parse.Object.extend("ClientProfile");
+    const cli = await new Parse.Query(Cliente).get(clienteId);
+
+    const ap = new Appointment();
+    ap.set("professional", profObj);
+    ap.set("client", cli);
+    ap.set("date", start);
+    ap.set("endDate", end);
+    ap.set("status", "agendada");
+    ap.set("createdBy", "profissional");
+    await ap.save();
+
+    // Atualiza créditos
     if (descontar) {
       const Relation = Parse.Object.extend("ProfessionalClientRelation");
-  const relQ = new Parse.Query(Relation);
+      const relQ = new Parse.Query(Relation);
       relQ.equalTo("professional", profObj);
       relQ.equalTo("client", cli);
       const rel = await relQ.first();
@@ -271,6 +250,9 @@ document.addEventListener("DOMContentLoaded", async () => {
         await rel.save();
       }
     }
+
+    // Notificação para o cliente
+    await criarNotificacao(cli, "Uma nova consulta foi adicionada à sua agenda pelo profissional.");
 
     calendar.addEvent({
       title: "Consulta - " + cli.get("name"),
@@ -283,21 +265,21 @@ document.addEventListener("DOMContentLoaded", async () => {
     alert("Consulta adicionada!");
   });
 
-  // === EXCLUIR CONSULTA ===
+  // === Excluir Consulta ===
   document.getElementById("confirmarDel").addEventListener("click", async () => {
     const devolver = document.getElementById("devolverCredito").checked;
 
     try {
-    const Appointment = Parse.Object.extend("Appointment");
+      const Appointment = Parse.Object.extend("Appointment");
       const q = new Parse.Query(Appointment);
       const ap = await q.get(selectedEvent.id);
       const cli = ap.get("client");
 
       if (devolver && cli) {
-  const Relation = Parse.Object.extend("ProfessionalClientRelation");
-  const r = new Parse.Query(Relation);
-  r.equalTo("professional", profObj);
-  r.equalTo("client", cli);
+        const Relation = Parse.Object.extend("ProfessionalClientRelation");
+        const r = new Parse.Query(Relation);
+        r.equalTo("professional", profObj);
+        r.equalTo("client", cli);
         const rel = await r.first();
         if (rel) {
           rel.increment("sessionsUsed", -1);
@@ -307,6 +289,12 @@ document.addEventListener("DOMContentLoaded", async () => {
 
       await ap.destroy();
       selectedEvent.remove();
+
+      // Notificação para o cliente
+      if (cli) {
+        await criarNotificacao(cli, "Uma consulta foi removida da sua agenda pelo profissional.");
+      }
+
       alert("Consulta removida!");
     } catch (e) {
       console.error(e);
@@ -316,7 +304,17 @@ document.addEventListener("DOMContentLoaded", async () => {
     document.getElementById("modalDel").style.display = "none";
   });
 
-  // === EXPORTAR PDF (mesma lógica anterior) ===
+  // === Criar Notificação ===
+  async function criarNotificacao(clienteObj, mensagem) {
+    const Notif = Parse.Object.extend("Notification");
+    const notif = new Notif();
+    notif.set("client", clienteObj);
+    notif.set("message", mensagem);
+    notif.set("seen", false);
+    await notif.save();
+  }
+
+  // === Exportar PDF ===
   document.getElementById("btnExport").addEventListener("click", async () => {
     const eventos = calendar.getEvents();
     if (!eventos.length) return alert("Sem eventos para exportar.");
@@ -332,7 +330,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     link.click();
   });
 
-  // === FECHAR MODAIS ===
+  // === Fechar Modais ===
   document.querySelectorAll(".btn-close, #cancelarAdd, #cancelarDel").forEach(b =>
     b.addEventListener("click", () => {
       document.getElementById("modalAdd").style.display = "none";

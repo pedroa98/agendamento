@@ -14,6 +14,9 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   const lista = document.getElementById("listaClientes");
   const mensagem = document.getElementById("mensagem");
+  const btnPromoAll = document.getElementById("promoAll");
+
+  let clientesAtivos = [];
 
   try {
     mensagem.textContent = "Carregando seus clientes...";
@@ -38,6 +41,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       return;
     }
 
+    clientesAtivos = relations.map(r => r.get("client"));
     mensagem.textContent = "";
     lista.innerHTML = "";
 
@@ -53,16 +57,15 @@ document.addEventListener("DOMContentLoaded", async () => {
         if (obj && obj.photoUrl) return obj.photoUrl;
         if (obj && obj.photo && obj.photo.url) return obj.photo.url;
       } catch (e) {}
-      return null;
+      return "https://via.placeholder.com/100";
     }
 
     relations.forEach(rel => {
       const client = rel.get("client");
-      const nome = (client && typeof client.get === 'function') ? client.get("name") : (client && client.name) || 'Cliente';
-      const telefone = (client && typeof client.get === 'function') ? (client.get("phone") || "Não informado") : (client && client.phone) || "Não informado";
-      const idade = calcIdade((client && typeof client.get === 'function') ? client.get("birthDate") : (client && client.birthDate));
-      const foto = photoUrlFor(client) || "https://via.placeholder.com/100";
-
+      const nome = client?.get("name") || "Cliente";
+      const telefone = client?.get("phone") || "Não informado";
+      const idade = calcIdade(client?.get("birthDate"));
+      const foto = photoUrlFor(client);
       const pagas = rel.get("sessionsPaid") || 0;
       const usadas = rel.get("sessionsUsed") || 0;
       const disponiveis = pagas - usadas;
@@ -76,12 +79,13 @@ document.addEventListener("DOMContentLoaded", async () => {
         <p>🎂 ${idade ? idade + " anos" : "Idade não informada"}</p>
         <p>💰 Sessões: ${usadas}/${pagas} (${disponiveis} disponíveis)</p>
         <button class="btn btn-green btn-add">Adicionar Crédito</button>
-        <button class="btn btn-blue btn-notes">Anotações</button>
+        <button class="btn btn-blue btn-promo">📢 Notificação Promocional</button>
         <button class="btn btn-red btn-encerrar">Encerrar</button>
       `;
 
+      // adicionar créditos
       card.querySelector(".btn-add").addEventListener("click", async () => {
-        const add = parseInt(prompt("Quantas novas sessões pagas deseja adicionar?"), 10);
+        const add = parseInt(prompt("Quantas novas sessões deseja adicionar?"), 10);
         if (!isNaN(add) && add > 0) {
           rel.increment("sessionsPaid", add);
           await rel.save();
@@ -90,25 +94,36 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
       });
 
-      card.querySelector(".btn-notes").addEventListener("click", async () => {
-        const atual = rel.get("notes") || "";
-        const texto = prompt("Observações sobre o cliente:", atual);
-        if (texto !== null) {
-          rel.set("notes", texto);
-          await rel.save();
-          alert("Anotações salvas!");
-        }
+      // enviar notificação promocional
+      card.querySelector(".btn-promo").addEventListener("click", async () => {
+        const texto = prompt("Digite a mensagem da promoção para este cliente:");
+        if (!texto) return;
+        await enviarNotificacao(client, prof, texto, "promoção");
+        alert("Notificação de promoção enviada!");
       });
 
+      // encerrar vínculo
       card.querySelector(".btn-encerrar").addEventListener("click", async () => {
-        if (confirm(`Encerrar vínculo com ${nome}?`)) {
-          rel.set("status", "encerrado");
-          await rel.save();
-          card.remove();
-        }
+        if (!confirm(`Encerrar vínculo com ${nome}?`)) return;
+        await enviarNotificacao(client, prof, "O profissional encerrou seu vínculo.", "encerramento");
+        await rel.destroy(); // apaga relação
+        alert("Vínculo encerrado e notificação enviada!");
+        location.reload();
       });
 
       lista.appendChild(card);
+    });
+
+    // botão de promoção em massa
+    btnPromoAll.addEventListener("click", async () => {
+      if (!clientesAtivos.length) return alert("Nenhum cliente ativo.");
+      const texto = prompt("Digite a mensagem da promoção para todos os clientes:");
+      if (!texto) return;
+
+      for (const cliente of clientesAtivos) {
+        await enviarNotificacao(cliente, prof, texto, "promoção");
+      }
+      alert("Promoção enviada para todos os clientes!");
     });
 
   } catch (err) {
@@ -126,3 +141,14 @@ document.addEventListener("DOMContentLoaded", async () => {
     return idade;
   }
 });
+
+async function enviarNotificacao(cliente, prof, texto, tipo) {
+  const Notificacao = Parse.Object.extend("Notificacao");
+  const n = new Notificacao();
+  n.set("client", cliente);
+  n.set("professional", prof);
+  n.set("type", tipo);
+  n.set("message", texto);
+  n.set("status", "nova");
+  await n.save();
+}
