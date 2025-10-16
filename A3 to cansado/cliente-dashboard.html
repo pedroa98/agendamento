@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard - Cliente</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/main.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/main.min.js"></script>
+  <script src="https://unpkg.com/parse/dist/parse.min.js"></script>
+  <script src="js/auth.js" defer></script>
+  <script src="js/cliente-dashboard.js" defer></script>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: "Poppins", sans-serif;
+      background-color: #f4f6f8;
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* MENU LATERAL */
+    .sidebar {
+      width: 250px;
+      background: #2c3e50;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      padding: 20px;
+    }
+
+    .sidebar h2 {
+      text-align: center;
+      margin-bottom: 20px;
+      font-size: 20px;
+      color: #ecf0f1;
+    }
+
+    .sidebar a {
+      color: #fff;
+      text-decoration: none;
+      padding: 10px 15px;
+      border-radius: 6px;
+      margin-bottom: 5px;
+      transition: background 0.2s;
+    }
+
+    .sidebar a:hover,
+    .sidebar a.active {
+      background-color: #3498db;
+    }
+
+    /* CONTEÚDO PRINCIPAL */
+    .main-content {
+      flex: 1;
+      padding: 30px;
+      overflow-y: auto;
+    }
+
+    .main-content h1 {
+      color: #2c3e50;
+      margin-bottom: 20px;
+    }
+
+    #calendar {
+      background: #fff;
+      padding: 15px;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      margin-bottom: 30px;
+    }
+
+    /* Notificações */
+    .notificacoes {
+      background: #fff;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .notificacao {
+      border-left: 6px solid #3498db;
+      padding: 12px 15px;
+      margin-bottom: 12px;
+      border-radius: 6px;
+      background: #f9f9f9;
+      transition: background 0.2s;
+    }
+
+    .notificacao.lida {
+      background: #ecf0f1;
+      border-left-color: #95a5a6;
+    }
+
+    .notificacao h4 {
+      margin: 0 0 6px;
+      color: #2c3e50;
+    }
+
+    .notificacao p {
+      margin: 0;
+      color: #555;
+    }
+
+    .notificacao small {
+      color: #888;
+    }
+
+    .notif-actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .btn-secondary {
+      background: #95a5a6;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      padding: 8px 12px;
+      cursor: pointer;
+    }
+
+    .btn-secondary:hover {
+      background: #7f8c8d;
+    }
+
+    .btn-danger {
+      background: #e74c3c;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      padding: 8px 12px;
+      cursor: pointer;
+    }
+
+    .btn-danger:hover {
+      background: #c0392b;
+    }
+
+    #btnMarcarTodas, #btnRemoverLidas {
+      font-size: 14px;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- MENU LATERAL -->
+  <div class="sidebar">
+    <h2>AutoCuidado</h2>
+    <a href="lista-servicos.html">🔍 Lista de Serviços</a>
+    <a href="meus-profissionais.html">👨‍⚕️ Meus Profissionais</a>
+    <a href="cliente-dashboard.html" class="active">📅 Minha Agenda</a>
+    <a href="editar-perfil-cliente.html">✏️ Editar Perfil</a>
+    <a href="login.html" onclick="localStorage.clear()">🚪 Sair</a>
+  </div>
+
+  <!-- CONTEÚDO PRINCIPAL -->
+  <div class="main-content">
+    <h1>Bem-vindo(a)!</h1>
+
+    <div id="calendar"></div>
+
+    <div class="notificacoes">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
+        <h2 style="margin:0">🔔 Notificações</h2>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button id="btnMarcarTodas" class="btn-secondary">Marcar todas como lidas</button>
+          <button id="btnRemoverLidas" class="btn-danger">Remover todas lidas</button>
+        </div>
+      </div>
+
+      <div id="listaNotificacoes" style="margin-top:12px"></div>
+      <p id="mensagem"></p>
+    </div>
+  </div>
+</body>
+</html>
