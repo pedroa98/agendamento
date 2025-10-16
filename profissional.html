@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Profissional - AutoCuidado</title>
+
+  <!-- FullCalendar -->
+  <link
+    href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/main.min.css"
+    rel="stylesheet"
+  />
+  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js"></script>
+
+  <!-- Parse SDK -->
+  <script src="https://unpkg.com/parse/dist/parse.min.js"></script>
+  <script src="js/auth.js" defer></script>
+  <script src="js/profissional-cliente-agenda.js" defer></script>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: "Poppins", sans-serif;
+      background: #f4f6f8;
+      display: flex;
+      min-height: 100vh;
+    }
+
+    .sidebar {
+      width: 240px;
+      background: #2c3e50;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      padding: 20px;
+    }
+
+    .sidebar h2 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .sidebar a {
+      color: #fff;
+      text-decoration: none;
+      padding: 10px;
+      border-radius: 6px;
+      margin-bottom: 8px;
+      transition: background 0.2s;
+    }
+
+    .sidebar a:hover,
+    .sidebar a.active {
+      background: #3498db;
+    }
+
+    .main-content {
+      flex: 1;
+      padding: 30px;
+    }
+
+    .perfil-container {
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      padding: 25px;
+      max-width: 700px;
+      margin: auto;
+      text-align: center;
+    }
+
+    .perfil-container img {
+      width: 140px;
+      height: 140px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+
+    .perfil-container h2 {
+      margin: 10px 0 5px;
+      color: #2c3e50;
+    }
+
+    #calendar {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+      padding: 15px;
+      max-width: 900px;
+      margin: 25px auto;
+    }
+
+    #mensagem {
+      text-align: center;
+      font-weight: bold;
+      color: #2c3e50;
+    }
+
+    .btn {
+      background: #3498db;
+      color: white;
+      border: none;
+      padding: 10px 16px;
+      border-radius: 6px;
+      margin: 5px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .btn:hover {
+      background: #2980b9;
+    }
+
+    .btn-green {
+      background: #2ecc71;
+    }
+
+    .btn-green:hover {
+      background: #27ae60;
+    }
+
+    .btn-orange {
+      background: #e67e22;
+    }
+
+    .btn-orange:hover {
+      background: #d35400;
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+    }
+
+    .modal-content {
+      background: #fff;
+      padding: 25px;
+      border-radius: 12px;
+      width: 90%;
+      max-width: 400px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    }
+
+    .modal-content h2 {
+      text-align: center;
+      color: #2c3e50;
+    }
+
+    .modal-actions {
+      text-align: center;
+      margin-top: 20px;
+    }
+
+    .modal-actions button {
+      margin: 0 10px;
+      padding: 8px 14px;
+      border: none;
+      border-radius: 6px;
+      color: white;
+      cursor: pointer;
+    }
+
+    .btn-close {
+      background: #7f8c8d;
+    }
+
+    .btn-close:hover {
+      background: #636e72;
+    }
+
+    .btn-danger {
+      background: #e74c3c;
+    }
+
+    .btn-danger:hover {
+      background: #c0392b;
+    }
+  </style>
+</head>
+<body>
+  <div class="sidebar">
+    <h2>AutoCuidado</h2>
+    <a href="cliente-dashboard.html">🏠 Dashboard</a>
+    <a href="lista-servicos.html" class="active">🔍 Lista de Serviços</a>
+    <a href="meus-profissionais.html">👨‍⚕️ Meus Profissionais</a>
+    <a href="editar-perfil-cliente.html">✏️ Editar Perfil</a>
+    <a href="login.html" onclick="localStorage.clear()">🚪 Logout</a>
+  </div>
+
+  <div class="main-content">
+    <div class="perfil-container" id="perfilProfissional">
+      <p>Carregando profissional...</p>
+    </div>
+
+    <div id="calendar"></div>
+    <p id="mensagem"></p>
+  </div>
+
+  <!-- MODAL MARCAR CONSULTA -->
+  <div class="modal" id="modalMarcar">
+    <div class="modal-content">
+      <h2>Confirmar Agendamento</h2>
+      <p id="textoData"></p>
+      <div class="modal-actions">
+        <button class="btn-green" id="confirmarMarcar">Confirmar</button>
+        <button class="btn-close" id="cancelarMarcar">Cancelar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL CANCELAR CONSULTA -->
+  <div class="modal" id="modalCancelar">
+    <div class="modal-content">
+      <h2>Cancelar Consulta</h2>
+      <p id="textoCancelar"></p>
+      <div class="modal-actions">
+        <button class="btn-danger" id="confirmarCancelar">Cancelar Consulta</button>
+        <button class="btn-close" id="fecharCancelar">Fechar</button>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
