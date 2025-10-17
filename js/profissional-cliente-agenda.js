@@ -111,8 +111,14 @@ document.addEventListener('DOMContentLoaded', async () => {
       <img src="${photoUrlFor(prof) || 'https://via.placeholder.com/150'}" alt="Foto">
       <h2>${prof.get('name')}</h2>
       <p>${prof.get('description') || ''}</p>
+      <p><strong>Tipo:</strong> ${prof.get('type') || 'Não informado'}</p>
+      <p><strong>Conselho:</strong> ${prof.get('councilNumber') || 'Não informado'}</p>
       <p>💰 ${prof.get('price') ? 'R$ ' + prof.get('price').toFixed(2) : 'Preço não informado'}</p>
-      <p>📍 ${prof.get('address') || 'Endereço não informado'}</p>
+  <p>📍 ${prof.get('address') || 'Endereço não informado'}</p>
+  <p>📧 ${prof.get('contactEmail') ? `<a href="mailto:${prof.get('contactEmail')}">${prof.get('contactEmail')}</a>` : 'E-mail não informado'}</p>
+  <p>📞 ${prof.get('phone') ? `<a href="tel:${prof.get('phone')}">${prof.get('phone')}</a>` : 'Telefone não informado'}</p>
+      <p>📧 ${prof.get('contactEmail') || 'E-mail não informado'}</p>
+      <p>📞 ${prof.get('phone') || 'Telefone não informado'}</p>
     `;
 
     const ClientProfile = Parse.Object.extend('ClientProfile');

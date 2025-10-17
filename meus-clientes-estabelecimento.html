@@ -3,12 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Interessados - Estabelecimento</title>
+  <title>Meus Clientes - Estabelecimento</title>
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="css/dashboard.css">
   <script src="https://unpkg.com/parse/dist/parse.min.js"></script>
   <script src="js/auth.js" defer></script>
-  <script src="js/interesses-estabelecimento.js" defer></script>
+  <script src="js/meus-clientes-estabelecimento.js" defer></script>
 </head>
 <body>
   <div class="dashboard-container">
@@ -24,34 +24,35 @@
     </aside>
 
     <main class="main-content">
-      <h1>Interessados</h1>
+      <h1>Meus Clientes</h1>
 
-      <!-- NOTIFICAÇÕES -->
+      <!-- NOTIFICAÇÕES NO TOPO -->
       <section id="notifications-area">
         <h2>Notificações</h2>
         <div id="notifications-controls">
           <button id="refresh-notifications">Atualizar</button>
           <button id="mark-all-read">Marcar todas como lidas</button>
+          <button id="remove-read">Remover lidas</button>
         </div>
         <ul id="notifications-list"></ul>
         <div id="no-notifications" style="display:none">Nenhuma notificação</div>
       </section>
 
-      <section id="requests-area">
-        <p>Mensagens e solicitações de vínculo enviadas por clientes.</p>
-        <ul id="lista-interesses"></ul>
+      <!-- LISTA DE CLIENTES -->
+      <section id="clients-area">
+        <div id="listaClientes"></div>
         <p id="mensagem"></p>
       </section>
 
+      <!-- PROPAGANDA EM BAIXO -->
       <section id="ads-area">
         <h2>Propaganda</h2>
         <div class="ad-card">
-          <h3>Promoção</h3>
-          <p>Coloque anúncios aqui.</p>
+          <h3>Parcerias</h3>
+          <p>Coloque sua propaganda aqui.</p>
         </div>
       </section>
     </main>
   </div>
 </body>
 </html>
-

@@ -63,7 +63,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     relations.forEach(rel => {
       const client = rel.get("client");
       const nome = client?.get("name") || "Cliente";
-      const telefone = client?.get("phone") || "Não informado";
+  const telefone = client?.get("phone") || "Não informado";
+  const email = client?.get("contactEmail") || client?.get("email") || "E-mail não informado";
       const idade = calcIdade(client?.get("birthDate"));
       const foto = photoUrlFor(client);
       const pagas = rel.get("sessionsPaid") || 0;
@@ -75,7 +76,8 @@ document.addEventListener("DOMContentLoaded", async () => {
       card.innerHTML = `
         <img src="${foto}" alt="${nome}">
         <h3>${nome}</h3>
-        <p>📞 ${telefone}</p>
+  <p>📞 ${telefone && telefone !== 'Não informado' ? `<a href="tel:${telefone}">${telefone}</a>` : telefone}</p>
+  <p>📧 ${email && email !== 'E-mail não informado' ? `<a href="mailto:${email}">${email}</a>` : email}</p>
         <p>🎂 ${idade ? idade + " anos" : "Idade não informada"}</p>
         <p>💰 Sessões: ${usadas}/${pagas} (${disponiveis} disponíveis)</p>
         <button class="btn btn-green btn-add">Adicionar Crédito</button>

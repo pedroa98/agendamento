@@ -4,8 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Dashboard - Estabelecimento</title>
-  <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/main.min.css" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/main.min.js"></script>
+  <!-- FullCalendar removido: agenda não é exibida na área principal -->
   <script src="https://unpkg.com/parse/dist/parse.min.js"></script>
   <link rel="stylesheet" href="css/dashboard.css">
   <script src="js/auth.js"></script>
@@ -15,7 +14,7 @@
     <aside class="sidebar">
       <h2>AutoCuidado</h2>
       <nav>
-        <a href="meus-clientes-.html" class="menu-btn">👥 Meus Clientes</a>
+        <a href="meus-clientes-estabelecimento.html" class="menu-btn">👥 Meus Clientes</a>
         <a href="interesses-estabelecimento.html" class="menu-btn">💬 Interessados</a>
         <a href="estabelecimento-agenda.html" class="menu-btn">📅 Agenda</a>
         <a href="editar-perfil-estabelecimento.html" class="menu-btn">✏️ Editar Perfil</a>
@@ -36,9 +35,17 @@
         <div id="no-notifications" style="display:none">Nenhuma notificação</div>
       </section>
 
-      <section id="calendar-area">
-        <h2>Minha Agenda</h2>
-        <div id="calendar"></div>
+      <!-- AREA DE PROPAGANDA (substitui agenda) -->
+      <section id="ads-area">
+        <h2>Propaganda</h2>
+        <div class="ad-card">
+          <h3>Parceria com ProdutosNaturais</h3>
+          <p>Desconto para clientes do estabelecimento nas compras online.</p>
+        </div>
+        <div class="ad-card">
+          <h3>Destaque do Mês</h3>
+          <p>Coloque sua promoção aqui! Contate marketing@exemplo.com</p>
+        </div>
       </section>
     </main>
   </div>

@@ -16,6 +16,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     descricao: document.getElementById("descricao"),
     endereco: document.getElementById("endereco"),
     telefone: document.getElementById("telefone"),
+    email: document.getElementById("email"),
     cnpj: document.getElementById("cnpj"),
     online: document.getElementById("online"),
     preco: document.getElementById("preco"),
@@ -29,6 +30,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     campos.nome.value = perfil.get("name") || "";
     campos.descricao.value = perfil.get("description") || "";
     campos.endereco.value = perfil.get("address") || "";
+    campos.telefone.value = perfil.get("phone") || "";
+    campos.email.value = perfil.get("contactEmail") || "";
     campos.online.value = perfil.get("attendsOnline") ? "true" : "false";
     campos.preco.value = perfil.get("price") || "";
     if (perfil.get("photo")) {
@@ -82,7 +85,8 @@ document.addEventListener("DOMContentLoaded", async () => {
       perfil.set("name", campos.nome.value.trim());
       perfil.set("description", campos.descricao.value.trim());
       perfil.set("address", campos.endereco.value.trim());
-      perfil.set("phone", campos.telefone.value.trim() || null);
+  perfil.set("phone", campos.telefone.value.trim() || null);
+  perfil.set("contactEmail", campos.email.value.trim() || null);
       perfil.set("cnpj", campos.cnpj.value.trim() || null);
       perfil.set("attendsOnline", campos.online.value === "true");
       perfil.set("price", parseFloat(campos.preco.value) || 0);
@@ -106,6 +110,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   });
 
   document.getElementById("voltarDashboard").addEventListener("click", () => {
-    window.location.href = "profissional-dashboard.html";
+    window.location.href = "estabelecimento-dashboard.html";
   });
 });

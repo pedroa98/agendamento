@@ -52,13 +52,22 @@ document.addEventListener("DOMContentLoaded", async () => {
       card.querySelector(".btn-aceitar").addEventListener("click", async () => {
         try {
           const Relation = Parse.Object.extend("ProfessionalClientRelation");
-          const rel = new Relation();
-          rel.set("professional", prof);
-          rel.set("client", client);
-          rel.set("status", "ativo");
-          rel.set("sessionsPaid", 0);
-          rel.set("sessionsUsed", 0);
-          await rel.save();
+          // checar duplicata
+          const relQ = new Parse.Query(Relation);
+          relQ.equalTo('professional', prof);
+          relQ.equalTo('client', client);
+          const existing = await relQ.first();
+          if (!existing) {
+            const rel = new Relation();
+            rel.set("professional", prof);
+            rel.set("client", client);
+            rel.set("status", "ativo");
+            rel.set("sessionsPaid", 0);
+            rel.set("sessionsUsed", 0);
+            await rel.save();
+          } else {
+            console.log('Relação ProfessionalClientRelation já existe — pulando criação');
+          }
 
           // Create notification for the client so they see the acceptance in their dashboard
           try {

@@ -1,6 +1,5 @@
 document.addEventListener("DOMContentLoaded", async () => {
   const user = await ensureSession();
-  // allow anonymous viewing? current flows expect login; keep same as profissional
   if (!user) { alert('Você precisa estar logado.'); window.location.href='login.html'; return; }
 
   const params = new URLSearchParams(window.location.search);
@@ -11,7 +10,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   try {
     const q = new Parse.Query('EstablishmentProfile');
     const est = await q.get(estId);
-    if (!est) { container.innerHTML = '<p>Estabelecimento não encontrado.</p>'; return; }
+  if (!est) { container.innerHTML = '<p>Estabelecimento não encontrado.</p>'; return; }
 
     function photoUrlFor(obj){ try { if (obj && typeof obj.get==='function') { const pf = obj.get('photo'); if (pf && typeof pf.url === 'function') return pf.url(); if (obj.get('photoUrl')) return obj.get('photoUrl'); } if (obj && obj.photo && obj.photo.url) return obj.photo.url; } catch(e){} return null; }
 
@@ -34,6 +33,8 @@ document.addEventListener("DOMContentLoaded", async () => {
       <p>${est.get('description') || ''}</p>
       <p>💲 ${est.get('price') ? 'R$ ' + est.get('price').toFixed(2) : 'Preço não informado'}</p>
       <p>📍 ${est.get('address') || 'Endereço não informado'}</p>
+  <p>📧 ${est.get('contactEmail') ? `<a href="mailto:${est.get('contactEmail')}">${est.get('contactEmail')}</a>` : 'E-mail não informado'}</p>
+  <p>📞 ${est.get('phone') ? `<a href="tel:${est.get('phone')}">${est.get('phone')}</a>` : 'Telefone não informado'}</p>
     `;
 
     // check existing relation between client and establishment (use EstablishmentClientRelation)

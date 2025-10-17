@@ -11,10 +11,12 @@ document.addEventListener("DOMContentLoaded", async () => {
     return;
   }
 
-  const listaNotificacoes = document.getElementById("listaNotificacoes");
-  const mensagem = document.getElementById("mensagem");
-  const btnMarcarTodas = document.getElementById("btnMarcarTodas");
-  const btnRemoverLidas = document.getElementById("btnRemoverLidas");
+  const listaNotificacoes = document.getElementById("notifications-list");
+  const noNotifications = document.getElementById("no-notifications");
+  const mensagem = document.getElementById("mensagem") || document.getElementById("message");
+  const btnMarkAll = document.getElementById("mark-all-read");
+  const btnRefresh = document.getElementById("refresh-notifications");
+  const btnRemoveRead = document.getElementById("remove-read");
 
   // Recupera o perfil do cliente
   const ClientProfile = Parse.Object.extend("ClientProfile");
@@ -51,19 +53,36 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   // Renderiza o calendário (igual antes)
-  await inicializarAgenda(clientProfile);
+    // Não renderizamos a agenda na área principal; mantemos apenas notificações e propaganda.
+    if (document.getElementById("calendar")) {
+      await inicializarAgenda(clientProfile);
+    }
 
   // Carrega notificações
   await carregarNotificacoes();
 
   // Ações em massa
-  btnMarcarTodas.addEventListener("click", async () => {
+  if (btnMarkAll) btnMarkAll.addEventListener("click", async () => {
     try {
       const notifs = await buscarTodas();
       const pendentes = notifs.filter(n => n.get("status") !== "lida");
-      await Parse.Object.saveAll(
-        pendentes.map(n => { n.set("status", "lida"); return n; })
-      );
+      // Handle SDK objects and REST wrappers
+      for (const n of pendentes) {
+        if (typeof n.set === 'function' && typeof n.save === 'function') {
+          n.set('status', 'lida');
+          await n.save();
+        } else if (n.id) {
+          // REST wrapper
+          n._raw = n._raw || {};
+          n._raw.status = 'lida';
+          const cfg = window.PARSE_CONFIG;
+          await fetch(`${cfg.serverURL}/classes/Notificacao/${n.id}`, {
+            method: 'PUT',
+            headers: { 'X-Parse-Application-Id': cfg.appId, 'X-Parse-JavaScript-Key': cfg.jsKey, 'X-Parse-Session-Token': clientProfile.__sessionToken || (user && user.__sessionToken), 'Content-Type': 'application/json' },
+            body: JSON.stringify(n._raw)
+          });
+        }
+      }
       await carregarNotificacoes();
     } catch (e) {
       console.error(e);
@@ -71,45 +90,35 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   });
 
-  btnRemoverLidas.addEventListener("click", async () => {
+  if (btnRefresh) btnRefresh.addEventListener('click', async () => { await carregarNotificacoes(); });
+
+  if (btnRemoveRead) btnRemoveRead.addEventListener('click', async () => {
     try {
       const notifs = await buscarTodas();
       const lidas = notifs.filter(n => n.get("status") === "lida");
-      await Parse.Object.destroyAll(lidas);
+      for (const n of lidas) {
+        if (typeof n.destroy === 'function') {
+          await n.destroy();
+        } else if (n.id) {
+          const cfg = window.PARSE_CONFIG;
+          await fetch(`${cfg.serverURL}/classes/Notificacao/${n.id}`, { method: 'DELETE', headers: { 'X-Parse-Application-Id': cfg.appId, 'X-Parse-JavaScript-Key': cfg.jsKey, 'X-Parse-Session-Token': clientProfile.__sessionToken || (user && user.__sessionToken) } });
+        }
+      }
       await carregarNotificacoes();
-    } catch (e) {
-      console.error(e);
-      alert("Erro ao remover notificações lidas.");
-    }
+    } catch (e) { console.error('Erro removendo lidas:', e); alert('Erro ao remover notificações lidas.'); }
   });
 
   // ---------- Funções ----------
   async function inicializarAgenda(clientProfile) {
     const calendarEl = document.getElementById("calendar");
-    const Appointment = Parse.Object.extend("Appointment");
-    const query = new Parse.Query(Appointment);
-    query.equalTo("client", clientProfile);
-    query.include("professional");
 
-    const results = await query.find();
 
-    const eventos = results.map(a => {
-      const prof = a.get("professional");
-      const nomeProf = prof ? prof.get("name") : "Profissional";
-      const status = a.get("status") || "pendente";
-      const cor = status === "aceito" ? "#2ecc71" : "#f39c12";
-      return { title: `${nomeProf} (${status})`, start: a.get("date"), backgroundColor: cor };
-    });
 
-    const calendar = new FullCalendar.Calendar(calendarEl, {
-      initialView: "timeGridWeek",
-      locale: "pt-br",
-      allDaySlot: false,
-      height: "auto",
-      headerToolbar: { left: "prev,next today", center: "title", right: "dayGridMonth,timeGridWeek,timeGridDay" },
-      events: eventos,
-    });
-    calendar.render();
+      if (!calendarEl) {
+        console.debug('inicializarAgenda: elemento #calendar não encontrado — pulando renderização.');
+        return;
+      }
+      // Se em outra página o calendário for necessário, a lógica pode ser implementada aqui.
   }
 
   async function buscarTodas() {
@@ -122,7 +131,32 @@ document.addEventListener("DOMContentLoaded", async () => {
       q.include("professional");
       q.descending("createdAt");
       q.limit(100); // ajuste se precisar de paginação
-      return await q.find();
+      const results = await q.find();
+      if (results && results.length) return results;
+
+      // Fallback: sometimes notifications were stored pointing directly to _User instead of ClientProfile.
+      // Try a REST query that searches for client pointer as either ClientProfile or _User.
+      try {
+        const cfg = window.PARSE_CONFIG;
+        const whereObj = { "$or": [ { client: { __type: 'Pointer', className: 'ClientProfile', objectId: clientProfile.id || clientProfile.objectId } }, { client: { __type: 'Pointer', className: '_User', objectId: user.id || user.objectId } } ] };
+        const where = encodeURIComponent(JSON.stringify(whereObj));
+        const url = `${cfg.serverURL}/classes/Notificacao?where=${where}&include=professional&order=-createdAt&limit=100`;
+        const res = await fetch(url, { headers: { 'X-Parse-Application-Id': cfg.appId, 'X-Parse-JavaScript-Key': cfg.jsKey, 'X-Parse-Session-Token': user.__sessionToken || (user && user.__sessionToken) } });
+        if (res.ok) {
+          const data = await res.json();
+          return data.results.map(r => ({
+            id: r.objectId,
+            createdAt: new Date(r.createdAt),
+            _raw: r,
+            get: (k) => { if (k === 'professional') return r.professional; return r[k]; },
+            set: (k, v) => { r[k] = v; },
+            save: async function() { const cfg = window.PARSE_CONFIG; const res = await fetch(`${cfg.serverURL}/classes/Notificacao/${this.id}`, { method: 'PUT', headers: { 'X-Parse-Application-Id': cfg.appId, 'X-Parse-JavaScript-Key': cfg.jsKey, 'X-Parse-Session-Token': user.__sessionToken || (clientProfile && clientProfile.__sessionToken), 'Content-Type': 'application/json' }, body: JSON.stringify(this._raw) }); if (!res.ok) throw new Error('Failed to save notification'); const d = await res.json(); Object.assign(this._raw, d); },
+            destroy: async function() { const cfg = window.PARSE_CONFIG; const res = await fetch(`${cfg.serverURL}/classes/Notificacao/${this.id}`, { method: 'DELETE', headers: { 'X-Parse-Application-Id': cfg.appId, 'X-Parse-JavaScript-Key': cfg.jsKey, 'X-Parse-Session-Token': user.__sessionToken || (clientProfile && clientProfile.__sessionToken) } }); if (!res.ok) throw new Error('Failed to delete notification'); }
+          }));
+        }
+      } catch (e) { console.warn('Fallback REST buscarTodas for user-pointer failed:', e); }
+
+      return results; // empty
     }
 
     // REST path: clientProfile is a plain object (from REST). Fetch notifications via REST and return thin wrappers
@@ -182,14 +216,17 @@ document.addEventListener("DOMContentLoaded", async () => {
     try {
       mensagem.textContent = "Carregando notificações...";
       listaNotificacoes.innerHTML = "";
+      const badgeEl = document.getElementById('notif-badge');
 
       const results = await buscarTodas();
 
       if (results.length === 0) {
         mensagem.textContent = "Nenhuma notificação.";
+        if (badgeEl) badgeEl.textContent = '0';
         return;
       }
       mensagem.textContent = "";
+      if (badgeEl) badgeEl.textContent = String(results.length);
 
       for (const notif of results) {
         const prof = notif.get("professional");
@@ -206,17 +243,30 @@ document.addEventListener("DOMContentLoaded", async () => {
           <h4>${tipo === "aceito" ? "✅ Aceito" : "🚫 Recusado"} - ${nomeProf}</h4>
           <p>${msg}</p>
           <small>${data}</small>
-          <div class="notif-actions">
-            <button class="btn-secondary btn-marcar">${lida ? "Marcar como não lida" : "Marcar como lida"}</button>
-            <button class="btn-danger btn-remover">Remover</button>
-          </div>
+            <div class="notif-actions">
+              <button class="btn-secondary btn-marcar">${lida ? "Marcar como não lida" : "Marcar como lida"}</button>
+              <button class="btn-danger btn-remover">Remover</button>
+            </div>
         `;
 
         // Ações individuais
         div.querySelector(".btn-marcar").addEventListener("click", async () => {
           try {
-            notif.set("status", lida ? "nova" : "lida");
-            await notif.save();
+            // Support both SDK and REST wrapper
+            if (typeof notif.set === 'function' && typeof notif.save === 'function') {
+              notif.set("status", lida ? "nova" : "lida");
+              await notif.save();
+            } else if (notif.id) {
+              // REST wrapper: update via REST
+              const cfg = window.PARSE_CONFIG;
+              notif._raw = notif._raw || {};
+              notif._raw.status = (lida ? "nova" : "lida");
+              await fetch(`${cfg.serverURL}/classes/Notificacao/${notif.id}`, {
+                method: 'PUT',
+                headers: { 'X-Parse-Application-Id': cfg.appId, 'X-Parse-JavaScript-Key': cfg.jsKey, 'X-Parse-Session-Token': clientProfile.__sessionToken || (user && user.__sessionToken), 'Content-Type': 'application/json' },
+                body: JSON.stringify(notif._raw)
+              });
+            }
             await carregarNotificacoes(); // re-render para refletir estado
           } catch (e) {
             console.error(e);
@@ -226,7 +276,12 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         div.querySelector(".btn-remover").addEventListener("click", async () => {
           try {
-            await notif.destroy();
+            if (typeof notif.destroy === 'function') {
+              await notif.destroy();
+            } else if (notif.id) {
+              const cfg = window.PARSE_CONFIG;
+              await fetch(`${cfg.serverURL}/classes/Notificacao/${notif.id}`, { method: 'DELETE', headers: { 'X-Parse-Application-Id': cfg.appId, 'X-Parse-JavaScript-Key': cfg.jsKey, 'X-Parse-Session-Token': clientProfile.__sessionToken || (user && user.__sessionToken) } });
+            }
             div.remove();
             if (!listaNotificacoes.children.length) mensagem.textContent = "Nenhuma notificação.";
           } catch (e) {

@@ -11,7 +11,9 @@
   <script src="js/estabelecimento-agenda.js" defer></script>
   <style>
     body { margin:0; font-family: 'Poppins', sans-serif; display:flex; min-height:100vh; background:#f4f6f8 }
-    .sidebar{ width:240px; background:#2c3e50; color:#fff; padding:20px }
+    .sidebar { width: 240px; background: #2c3e50; color: #fff; display: flex; flex-direction: column; padding: 20px; }
+    .sidebar a { color: #fff; text-decoration: none; padding: 10px; border-radius: 6px; margin-bottom: 8px; }
+    .sidebar a.active, .sidebar a:hover { background: #3498db; }
     .main-content{ flex:1; padding:30px }
     #calendar{ background:white; border-radius:12px; padding:15px; max-width:1000px; margin:0 auto }
   </style>
@@ -19,8 +21,8 @@
 <body>
   <div class="sidebar">
     <h2>AutoCuidado</h2>
-    <a href="profissional-dashboard.html">Dashboard</a>
-    <a href="meus-profissionais.html">Meus Clientes</a>
+    <a href="estabelecimento-dashboard.html">Dashboard</a>
+    <a href="meus-clientes-estabelecimento.html">Meus Clientes</a>
     <a href="#" class="active">Minha Agenda</a>
     <a href="editar-perfil-estabelecimento.html">Editar Perfil</a>
     <a href="login.html" onclick="localStorage.clear()">Logout</a>

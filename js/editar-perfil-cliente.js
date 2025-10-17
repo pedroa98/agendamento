@@ -91,6 +91,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   const nome = document.getElementById("nome");
   const telefone = document.getElementById("telefone");
+  const emailInput = document.getElementById("email");
   const nascimento = document.getElementById("nascimento");
   const idadeSpan = document.getElementById("idade");
   const fotoInput = document.getElementById("foto");
@@ -120,6 +121,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (isRestUser) {
       nome.value = perfil.name || "";
       telefone.value = perfil.phone || "";
+      emailInput.value = perfil.contactEmail || perfil.email || "";
       if (perfil.birthDate) {
         const d = new Date(perfil.birthDate);
         nascimento.value = d.toISOString().split("T")[0];
@@ -133,6 +135,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     } else {
       nome.value = perfil.get("name") || "";
       telefone.value = perfil.get("phone") || "";
+  emailInput.value = perfil.get("contactEmail") || "";
       if (perfil.get("birthDate")) {
         const d = new Date(perfil.get("birthDate"));
         nascimento.value = d.toISOString().split("T")[0];
@@ -203,6 +206,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         perfil.set("user", user);
         perfil.set("name", nome.value.trim());
         perfil.set("phone", telefone.value.trim());
+  perfil.set("contactEmail", emailInput.value.trim());
         if (nascimento.value) perfil.set("birthDate", new Date(nascimento.value));
 
         if (nascimento.value) {
@@ -224,6 +228,7 @@ document.addEventListener("DOMContentLoaded", async () => {
           user: { __type: 'Pointer', className: '_User', objectId: user.id },
           name: nome.value.trim(),
           phone: telefone.value.trim(),
+          contactEmail: emailInput.value.trim(),
         };
         if (nascimento.value) {
           payload.birthDate = { __type: 'Date', iso: new Date(nascimento.value).toISOString() };

@@ -29,6 +29,9 @@ document.addEventListener("DOMContentLoaded", async () => {
   const campos = {
     nome: document.getElementById("nome"),
     descricao: document.getElementById("descricao"),
+    tipo: document.getElementById("tipo"),
+    email: document.getElementById("email"),
+    telefone: document.getElementById("telefone"),
     conselho: document.getElementById("conselho"),
     endereco: document.getElementById("endereco"),
     online: document.getElementById("online"),
@@ -43,6 +46,9 @@ document.addEventListener("DOMContentLoaded", async () => {
   if (!primeiraVez) {
     campos.nome.value = perfil.get("name") || "";
     campos.descricao.value = perfil.get("description") || "";
+    campos.tipo.value = perfil.get("type") || "";
+    campos.email.value = perfil.get("contactEmail") || "";
+    campos.telefone.value = perfil.get("phone") || "";
     campos.conselho.value = perfil.get("councilNumber") || "";
     campos.endereco.value = perfil.get("address") || "";
     campos.online.value = perfil.get("attendsOnline") ? "true" : "false";
@@ -91,6 +97,9 @@ document.addEventListener("DOMContentLoaded", async () => {
       perfil.set("user", user);
       perfil.set("name", campos.nome.value.trim());
       perfil.set("description", campos.descricao.value.trim());
+      perfil.set("type", campos.tipo.value.trim() || null);
+      perfil.set("contactEmail", campos.email.value.trim() || null);
+      perfil.set("phone", campos.telefone.value.trim() || null);
       perfil.set("councilNumber", campos.conselho.value.trim());
       perfil.set("address", campos.endereco.value.trim());
       perfil.set("attendsOnline", campos.online.value === "true");
