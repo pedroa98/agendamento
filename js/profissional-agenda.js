@@ -252,7 +252,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     // Notificação para o cliente
-    await criarNotificacao(cli, "Uma nova consulta foi adicionada à sua agenda pelo profissional.");
+  await criarNotificacaoParaCliente(cli, "Uma nova consulta foi adicionada à sua agenda pelo profissional.");
 
     calendar.addEvent({
       title: "Consulta - " + cli.get("name"),
@@ -292,7 +292,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
       // Notificação para o cliente
       if (cli) {
-        await criarNotificacao(cli, "Uma consulta foi removida da sua agenda pelo profissional.");
+  await criarNotificacaoParaCliente(cli, "Uma consulta foi removida da sua agenda pelo profissional.");
       }
 
       alert("Consulta removida!");
@@ -305,13 +305,21 @@ document.addEventListener("DOMContentLoaded", async () => {
   });
 
   // === Criar Notificação ===
-  async function criarNotificacao(clienteObj, mensagem) {
-    const Notif = Parse.Object.extend("Notification");
-    const notif = new Notif();
-    notif.set("client", clienteObj);
-    notif.set("message", mensagem);
-    notif.set("seen", false);
-    await notif.save();
+  async function criarNotificacaoParaCliente(clienteObj, mensagem, tipo) {
+    try {
+      const Notificacao = Parse.Object.extend('Notificacao');
+      const notif = new Notificacao();
+      // destinatário: cliente
+      notif.set('client', clienteObj);
+      // remetente profissional (informativo)
+      try { if (profObj) notif.set('fromProfessional', profObj); } catch(e){}
+      if (tipo) notif.set('type', tipo);
+      notif.set('message', mensagem);
+      notif.set('status', 'nova');
+      await notif.save();
+    } catch (err) {
+      console.error('Erro criando notificação (profissional-agenda):', err);
+    }
   }
 
   // === Exportar PDF ===

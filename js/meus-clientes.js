@@ -147,9 +147,11 @@ document.addEventListener("DOMContentLoaded", async () => {
 async function enviarNotificacao(cliente, prof, texto, tipo) {
   const Notificacao = Parse.Object.extend("Notificacao");
   const n = new Notificacao();
+  // destinatário: cliente
   n.set("client", cliente);
-  n.set("professional", prof);
-  n.set("type", tipo);
+  // remetente profissional (informativo)
+  try { n.set('fromProfessional', prof); } catch(e){}
+  if (tipo) n.set("type", tipo);
   n.set("message", texto);
   n.set("status", "nova");
   await n.save();

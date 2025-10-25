@@ -73,8 +73,10 @@ document.addEventListener("DOMContentLoaded", async () => {
           try {
             const Notificacao = Parse.Object.extend("Notificacao");
             const notif = new Notificacao();
+            // destinatário: cliente
             notif.set("client", client);
-            notif.set("professional", prof);
+            // remetente profissional (contexto)
+            try { notif.set('fromProfessional', prof); } catch(e){}
             notif.set("message", `Seu pedido foi aceito pelo profissional ${prof.get ? prof.get('name') : ''}`);
             notif.set("status", "nova");
             notif.set("type", "aceito");
@@ -105,8 +107,9 @@ document.addEventListener("DOMContentLoaded", async () => {
           try {
             const Notificacao = Parse.Object.extend("Notificacao");
             const notif = new Notificacao();
+            // destinatário: cliente
             notif.set("client", client);
-            notif.set("professional", prof);
+            try { notif.set('fromProfessional', prof); } catch(e){}
             notif.set("message", `O profissional ${prof.get ? prof.get('name') : ''} não está disponível no momento.`);
             notif.set("status", "nova");
             notif.set("type", "recusado");

@@ -56,20 +56,28 @@ document.addEventListener('DOMContentLoaded', async () => {
   let clientProfile = null;
   let relation = null;
   let currentAppointments = [];
+  // Horários e datas bloqueadas do profissional
+  let workingHours = {};
+  let blockedDates = [];
 
-  // 🔔 Cria uma notificação para o profissional
-  async function criarNotificacao(professional, clientProfile, mensagem) {
+  // 🔔 Cria uma notificação destinada ao profissional (originada por um cliente)
+  // Guarda o remetente em 'fromClient' para que o profissional saiba quem fez a ação,
+  // mas não define o ponteiro 'client' como destinatário para evitar que a notificação
+  // seja listada também no dashboard do cliente.
+  async function criarNotificacaoParaProfissional(professional, clientProfile, mensagem, tipo) {
     try {
       const Notificacao = Parse.Object.extend('Notificacao');
       const notif = new Notificacao();
-      notif.set('professional', professional);
-      notif.set('client', clientProfile);
+      notif.set('professional', professional); // destinatário
+      // remetente
+      try { notif.set('fromClient', clientProfile); } catch (e) { /* ignore */ }
+      if (tipo) notif.set('type', tipo);
       notif.set('message', mensagem);
       notif.set('status', 'nova');
       await notif.save();
-      console.log('Notificação criada:', mensagem);
+      console.log('Notificação criada para profissional:', mensagem);
     } catch (err) {
-      console.error('Erro ao criar notificação:', err);
+      console.error('Erro ao criar notificação para profissional:', err);
     }
   }
 
@@ -91,6 +99,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     const Prof = Parse.Object.extend('ProfessionalProfile');
     const profQ = new Parse.Query(Prof);
     prof = await profQ.get(profId);
+
+    // carregar horários bloqueados / working hours para validação
+    try {
+      workingHours = prof.get('workingHours') || {};
+      blockedDates = prof.get('blockedDates') || [];
+    } catch (e) { workingHours = {}; blockedDates = []; }
 
     function photoUrlFor(obj) {
       try {
@@ -153,11 +167,15 @@ document.addEventListener('DOMContentLoaded', async () => {
         const texto = prompt('Mensagem para o profissional (opcional):', 'Olá, gostaria de me vincular.');
         const Interesse = Parse.Object.extend('Interesse');
         const i = new Interesse();
-        i.set('client', clientProfile);
-        i.set('professional', prof);
-        i.set('message', texto || '');
-        await i.save();
-        alert('Interesse enviado ao profissional.');
+          i.set('client', clientProfile);
+          i.set('professional', prof);
+          i.set('message', texto || '');
+          await i.save();
+          // criar notificação para o profissional
+          try {
+            await criarNotificacaoParaProfissional(prof, clientProfile, `Novo interesse: ${texto || ''}`, 'interesse');
+          } catch (e) { console.warn('Falha ao notificar profissional sobre interesse:', e); }
+          alert('Interesse enviado ao profissional.');
       });
       actions.appendChild(btn);
       perfilEl.appendChild(actions);
@@ -199,13 +217,11 @@ document.addEventListener('DOMContentLoaded', async () => {
       },
       validRange: { start: new Date() },
       selectAllow: (selectInfo) => {
-        // Bloqueia horários passados e sobrepostos
-        return (
-          selectInfo.start >= new Date() &&
-          !currentAppointments.some(ev =>
-            (selectInfo.start < ev.end && selectInfo.end > ev.start)
-          )
-        );
+        // Bloqueia horários passados, sobrepostos e fora do horário de trabalho / datas bloqueadas
+        const nowOk = selectInfo.start >= new Date();
+        const noOverlap = !currentAppointments.some(ev => (selectInfo.start < ev.end && selectInfo.end > ev.start));
+        const notBlocked = !isDateBlocked(selectInfo.start, selectInfo.end);
+        return nowOk && noOverlap && notBlocked;
       },
       select: onSelectSlot,
       eventClick: onEventClick,
@@ -235,6 +251,27 @@ document.addEventListener('DOMContentLoaded', async () => {
         extendedProps: { appointmentObj: a }
       };
     });
+  }
+
+  // === Função auxiliar para checar se a data está bloqueada ou fora do horário de trabalho ===
+  function isDateBlocked(start, end) {
+    try {
+      const yyyy = start.getFullYear();
+      const mm = String(start.getMonth() + 1).padStart(2, '0');
+      const dd = String(start.getDate()).padStart(2, '0');
+      const key = `${yyyy}-${mm}-${dd}`;
+      if (blockedDates.includes(key)) return true;
+
+      const dayNames = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
+      const day = dayNames[start.getDay()];
+      const wh = workingHours[day];
+      if (!wh) return true; // sem horário definido -> fora do expediente
+      const startHM = `${String(start.getHours()).padStart(2, '0')}:${String(start.getMinutes()).padStart(2, '0')}`;
+      const endHM = `${String(end.getHours()).padStart(2, '0')}:${String(end.getMinutes()).padStart(2, '0')}`;
+      return !(startHM >= wh[0] && endHM <= wh[1]);
+    } catch (e) {
+      return false;
+    }
   }
 
   function onSelectSlot(selectionInfo) {
@@ -269,6 +306,13 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   confirmarMarcar.addEventListener('click', async () => {
     if (!selectedSlot) return;
+    // checagem extra de segurança (não confiar apenas no selectAllow)
+    if (isDateBlocked(selectedSlot.start, selectedSlot.end)) {
+      alert('O horário selecionado está fora do horário de trabalho ou é uma data bloqueada.');
+      modalMarcar.style.display = 'none';
+      selectedSlot = null;
+      return;
+    }
     try {
       const Appointment = Parse.Object.extend('Appointment');
       const a = new Appointment();
@@ -279,10 +323,11 @@ document.addEventListener('DOMContentLoaded', async () => {
       await a.save();
 
       const dataFmt = new Date(selectedSlot.start).toLocaleString('pt-BR');
-      await criarNotificacao(
+      await criarNotificacaoParaProfissional(
         prof,
         clientProfile,
-        `${nomeDoCliente()} marcou uma consulta para ${dataFmt}.`
+        `${nomeDoCliente()} marcou uma consulta para ${dataFmt}.`,
+        'agendada'
       );
 
       relation.increment('sessionsUsed', 1);
@@ -339,10 +384,11 @@ document.addEventListener('DOMContentLoaded', async () => {
       await appt.destroy();
 
       const dataFmt = apptDate.toLocaleString('pt-BR');
-      await criarNotificacao(
+      await criarNotificacaoParaProfissional(
         prof,
         clientProfile,
-        `${nomeDoCliente()} cancelou a consulta agendada para ${dataFmt}.`
+        `${nomeDoCliente()} cancelou a consulta agendada para ${dataFmt}.`,
+        'cancelamento'
       );
 
       alert('Consulta apagada com sucesso.');

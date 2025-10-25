@@ -91,13 +91,14 @@ document.addEventListener('DOMContentLoaded', async () => {
 		// tentar notificar o cliente
 		try {
 			const Notificacao = Parse.Object.extend('Notificacao');
-			const n = new Notificacao();
-			n.set('establishment', i.get('establishment'));
-			n.set('client', i.get('client'));
-			n.set('type', 'aceito');
-			n.set('message', 'Seu pedido de vínculo com o estabelecimento foi aceito.');
-			n.set('status', 'nova');
-			await n.save();
+			const notif = new Notificacao();
+			// destinatário: cliente
+			notif.set("client", i.get('client'));
+			try { notif.set('fromEstablishment', i.get('establishment')); } catch(e){}
+			notif.set("type", "aceito");
+			notif.set("message", "Seu pedido de vínculo com o estabelecimento foi aceito.");
+			notif.set("status", "nova");
+			await notif.save();
 		} catch (e) { console.warn('Não foi possível criar notificação:', e); }
 		await i.destroy();
 	}
@@ -109,13 +110,14 @@ document.addEventListener('DOMContentLoaded', async () => {
 		// notificar rejeição
 		try {
 			const Notificacao = Parse.Object.extend('Notificacao');
-			const n = new Notificacao();
-			n.set('establishment', i.get('establishment'));
-			n.set('client', i.get('client'));
-			n.set('type', 'rejeitado');
-			n.set('message', 'Seu pedido de vínculo com o estabelecimento foi rejeitado.');
-			n.set('status', 'nova');
-			await n.save();
+			const notif = new Notificacao();
+			// destinatário: cliente
+			notif.set("client", i.get('client'));
+			try { notif.set('fromEstablishment', i.get('establishment')); } catch(e){}
+			notif.set("type", "rejeitado");
+			notif.set("message", "Seu pedido de vínculo com o estabelecimento foi rejeitado.");
+			notif.set("status", "nova");
+			await notif.save();
 		} catch (e) { console.warn('Não foi possível criar notificação:', e); }
 		await i.destroy();
 	}

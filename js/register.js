@@ -94,16 +94,16 @@ document.addEventListener("DOMContentLoaded", () => {
         // redirect according to role
         switch ((session.role || role || '').toLowerCase()) {
           case 'cliente':
-            window.location.href = 'cliente-dashboard.html';
+            window.location.href = 'login.html';  // after registration, client goes to login to re-authenticate
             break;
           case 'profissional':
-            window.location.href = 'profissional-dashboard.html';
+            window.location.href = 'login.html';  // after registration, professional goes to login to re-authenticate
             break;
           case 'estabelecimento':
-            window.location.href = 'estabelecimento-dashboard.html';
+            window.location.href = 'login.html';  // after registration, establishment goes to login to re-authenticate
             break;
           default:
-            window.location.href = 'client_dashboard.html';
+            window.location.href = 'login.html';  // fallback
         }
       }, 1200);
     } catch (err) {
