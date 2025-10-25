@@ -151,6 +151,32 @@ document.addEventListener('DOMContentLoaded', async () => {
     const actions = document.createElement('div');
     actions.style.marginTop = '12px';
 
+    // botão de exportar agenda (visível quando a agenda é exibida)
+    const exportBtn = document.createElement('button');
+    exportBtn.className = 'btn btn-blue';
+    exportBtn.id = 'btnExportPublic';
+    exportBtn.textContent = '📤 Exportar Semana (PDF)';
+    exportBtn.style.marginLeft = '8px';
+    exportBtn.addEventListener('click', async () => {
+      if (!calendar) return alert('Agenda ainda não carregada.');
+      const eventos = calendar.getEvents();
+      if (!eventos.length) return alert('Sem eventos para exportar.');
+      try {
+        const jsPDF = (window.jspdf && window.jspdf.jsPDF) ? window.jspdf.jsPDF : null;
+        if (!jsPDF) throw new Error('jsPDF não carregado');
+        const doc = new jsPDF({ unit: 'pt', format: 'a4' });
+        const rows = eventos.map(e => [e.start.toLocaleDateString(), e.start.toLocaleTimeString() + ' - ' + (e.end ? e.end.toLocaleTimeString() : ''), e.title]);
+        doc.text('Agenda - Profissional', 40, 50);
+        doc.autoTable({ startY: 70, head: [['Data','Hora','Compromisso']], body: rows, styles: { fontSize: 10 }, headStyles: { fillColor: [44,62,80], textColor: 255 } });
+        doc.save('agenda-semana.pdf');
+      } catch (err) {
+        console.error('Erro exportando PDF (public):', err);
+        const blob = new Blob([eventos.map(e=>`${e.start.toLocaleString()} - ${e.title}`).join('\n')], { type: 'text/plain' });
+        const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'agenda-semana.txt'; a.click();
+      }
+    });
+    actions.appendChild(exportBtn);
+
     if (!clientProfile) {
       const btn = document.createElement('button');
       btn.className = 'btn btn-blue';

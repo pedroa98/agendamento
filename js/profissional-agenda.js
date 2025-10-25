@@ -327,15 +327,81 @@ document.addEventListener("DOMContentLoaded", async () => {
     const eventos = calendar.getEvents();
     if (!eventos.length) return alert("Sem eventos para exportar.");
 
-    const texto = eventos.map(e =>
+    const linhas = eventos.map(e =>
       `${e.start.toLocaleDateString()} ${e.start.toLocaleTimeString()} - ${e.title}`
-    ).join("\n");
+    );
 
-    const blob = new Blob([texto], { type: "application/pdf" });
-    const link = document.createElement("a");
-    link.href = URL.createObjectURL(blob);
-    link.download = "agenda-semana.pdf";
-    link.click();
+    // Carrega jsPDF dinamicamente se necessário e gera um PDF válido
+    async function loadJsPDF() {
+      if (window.jspdf && window.jspdf.jsPDF) return window.jspdf.jsPDF;
+      return new Promise((resolve, reject) => {
+        const s = document.createElement('script');
+        s.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
+        s.onload = () => {
+          try { resolve(window.jspdf.jsPDF); } catch (e) { reject(e); }
+        };
+        s.onerror = reject;
+        document.head.appendChild(s);
+      });
+    }
+
+    try {
+      // use preloaded jsPDF and AutoTable when available
+      const jsPDF = (window.jspdf && window.jspdf.jsPDF) ? window.jspdf.jsPDF : null;
+      if (!jsPDF) throw new Error('jsPDF não disponível');
+      const doc = new jsPDF({ unit: 'pt', format: 'a4' });
+      const margin = 40;
+
+      // build table body rows: [date, time range, title]
+      const rows = eventos.map((e) => {
+        const date = e.start.toLocaleDateString();
+        const time = e.start.toLocaleTimeString() + ' - ' + (e.end ? e.end.toLocaleTimeString() : '');
+        const title = e.title || '';
+        return [date, time, title];
+      });
+
+      doc.setFontSize(16);
+      doc.setTextColor(44,62,80);
+      doc.text('Agenda - Semana', margin, 50);
+
+      // AutoTable options
+      doc.autoTable({
+        startY: 70,
+        head: [['Data', 'Hora', 'Compromisso']],
+        body: rows,
+        theme: 'striped',
+        headStyles: { fillColor: [44,62,80], textColor: 255 },
+        styles: { fontSize: 10, textColor: [33,33,33] },
+        columnStyles: { 0: { cellWidth: 90 }, 1: { cellWidth: 120 }, 2: { cellWidth: 'auto' } },
+        didDrawCell: function (data) {
+          // optionally draw a small color marker on the left of each row using event color
+          if (data.section === 'body' && data.column.index === 0) {
+            try {
+              const ev = calendar.getEvents()[data.row.index];
+              const color = ev && ev.backgroundColor ? ev.backgroundColor : '#3498db';
+              const rgb = /^#?([a-fA-F\d]{2})([a-fA-F\d]{2})([a-fA-F\d]{2})$/.exec(color);
+              if (rgb) {
+                const r = parseInt(rgb[1], 16), g = parseInt(rgb[2], 16), b = parseInt(rgb[3], 16);
+                const x = data.cell.x - 6;
+                const y = data.cell.y + (data.cell.height/2) - 4;
+                doc.setFillColor(r,g,b);
+                doc.rect(x, y, 8, 8, 'F');
+              }
+            } catch (e) { /* ignore */ }
+          }
+        }
+      });
+
+      doc.save('agenda-semana.pdf');
+    } catch (err) {
+      console.error('Erro gerando PDF com AutoTable, fallback para texto:', err);
+      const texto = linhas.join('\n');
+      const blob = new Blob([texto], { type: 'text/plain' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = 'agenda-semana.txt';
+      link.click();
+    }
   });
 
   // === Fechar Modais ===
