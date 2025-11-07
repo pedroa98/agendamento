@@ -5,7 +5,12 @@
 class LoadingOverlay {
   constructor() {
     this.overlay = null;
-    this.init();
+    // Wait for DOM to be ready before initializing
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', () => this.init());
+    } else {
+      this.init();
+    }
   }
 
   init() {
@@ -17,7 +22,13 @@ class LoadingOverlay {
         <div class="spinner"></div>
         <div class="loading-text">Carregando...</div>
       `;
-      document.body.appendChild(this.overlay);
+      
+      // Ensure body exists before appending
+      if (document.body) {
+        document.body.appendChild(this.overlay);
+      } else {
+        console.warn('LoadingOverlay: document.body not available yet');
+      }
     } else {
       this.overlay = document.querySelector('.loading-overlay');
     }
@@ -45,17 +56,23 @@ class LoadingOverlay {
   }
 }
 
-// Global instance
-const loader = new LoadingOverlay();
+// Global instance - only create if not already exists
+if (typeof loader === 'undefined') {
+  var loader = new LoadingOverlay();
+}
 
 // Auto-hide after page load
 window.addEventListener('load', () => {
   setTimeout(() => {
-    loader.hide();
+    if (typeof loader !== 'undefined') {
+      loader.hide();
+    }
   }, 300);
 });
 
 // Show loader on page navigation
 window.addEventListener('beforeunload', () => {
-  loader.show('Carregando...');
+  if (typeof loader !== 'undefined') {
+    loader.show('Carregando...');
+  }
 });

@@ -2,12 +2,12 @@ document.addEventListener("DOMContentLoaded", async () => {
   const user = await ensureSession();
   if (!user) {
     alert("Você precisa estar logado para acessar o dashboard.");
-    window.location.href = "login.html";
+    goToLogin();
     return;
   }
   if (user.get("role") !== "cliente") {
     alert("Acesso negado. Apenas clientes podem acessar este painel.");
-    window.location.href = "login.html";
+    goToLogin();
     return;
   }
 
