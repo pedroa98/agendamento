@@ -278,7 +278,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   });
 
   document.getElementById("voltarDashboard").addEventListener("click", () => {
-    window.location.href = "cliente-dashboard.html";
+    window.location.href = "../dashboard/";
   });
 
   function atualizarIdade(data) {

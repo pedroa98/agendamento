@@ -127,6 +127,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   });
 
   document.getElementById("voltarDashboard").addEventListener("click", () => {
-    window.location.href = "profissional-dashboard.html";
+    window.location.href = "../dashboard/";
   });
 });

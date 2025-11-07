@@ -1,0 +1,12 @@
+separar as paginas por tipo de usuario
+criar rotas para cada tipo de usuario
+def separar_paginas_por_tipo_de_usuario(usuario):
+    if usuario.tipo == 'admin':
+        return rotas_admin()
+    elif usuario.tipo == 'editor':
+        return rotas_editor()
+    elif usuario.tipo == 'visualizador':
+        return rotas_visualizador()
+    else:
+        return rotas_publico()
+

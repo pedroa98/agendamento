@@ -7,7 +7,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const q = new Parse.Query(ClientProfile);
   q.equalTo('user', user);
   const clientProfile = await q.first();
-  if (!clientProfile) { alert('Você precisa completar seu perfil de cliente.'); window.location.href='editar-perfil-cliente.html'; return; }
+  if (!clientProfile) { alert('Você precisa completar seu perfil de cliente.'); window.location.href='../editar-perfil/'; return; }
 
   const calendarEl = document.getElementById('calendar');
 
