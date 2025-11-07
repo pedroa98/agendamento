@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lista de Serviços - Cliente</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="../../css/animations.css">
+  <link rel="stylesheet" href="../../css/sidebar.css">
+  <link rel="stylesheet" href="../../css/dashboard-modern.css">
+  <script src="https://unpkg.com/parse/dist/parse.min.js"></script>
+  <script src="../../js/path-helper.js"></script>
+  <script src="../../js/auth.js" defer></script>
+  <script src="../../js/loader.js"></script>
+  <script src="../../js/sidebar.js" defer></script>
+  <script src="../../js/lista-servicos.js" defer></script>
+</head>
+
+<body>
+  <div id="loading-overlay" class="loading-overlay">
+    <div class="spinner"></div>
+  </div>
+
+  <div class="dashboard-container fade-in">
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <h2><i class="fas fa-heart-pulse"></i> AutoCuidado</h2>
+        <p class="brand-subtitle">Cliente</p>
+      </div>
+      <nav>
+        <a href="../dashboard/" class="menu-btn"><i class="fas fa-home"></i> <span>Dashboard</span></a>
+        <a href="../lista-servicos/" class="menu-btn active"><i class="fas fa-search"></i> <span>Buscar Serviços</span></a>
+        <a href="../meus-profissionais/" class="menu-btn"><i class="fas fa-user-md"></i> <span>Meus Profissionais</span></a>
+        <a href="../agenda/" class="menu-btn"><i class="fas fa-calendar-alt"></i> <span>Minha Agenda</span></a>
+        <a href="../editar-perfil/" class="menu-btn"><i class="fas fa-user-edit"></i> <span>Editar Perfil</span></a>
+        <a href="../../login.html" class="menu-btn logout"><i class="fas fa-sign-out-alt"></i> <span>Sair</span></a>
+      </nav>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+      <h1><i class="fas fa-search"></i> Buscar Serviços</h1>
+      <p class="page-subtitle">Encontre profissionais e estabelecimentos próximos a você</p>
+
+      <!-- FILTROS -->
+      <div class="dashboard-card">
+        <div class="card-header">
+          <h2 class="card-title"><i class="fas fa-filter"></i> Filtros de Busca</h2>
+        </div>
+        <div class="filters-container" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; padding: 1.5rem;">
+          <div class="input-group">
+            <label for="busca"><i class="fas fa-search"></i> Buscar</label>
+            <input type="text" id="busca" placeholder="Nome, especialidade ou serviço..." style="padding: 0.7rem; border: 1px solid #ddd; border-radius: 8px; width: 100%;">
+          </div>
+          <div class="input-group">
+            <label for="tipo"><i class="fas fa-filter"></i> Tipo</label>
+            <select id="tipo" style="padding: 0.7rem; border: 1px solid #ddd; border-radius: 8px; width: 100%;">
+              <option value="">Todos</option>
+              <option value="profissional">Profissional</option>
+              <option value="estabelecimento">Estabelecimento</option>
+            </select>
+          </div>
+          <div class="input-group">
+            <label for="especialidade"><i class="fas fa-briefcase"></i> Especialidade</label>
+            <select id="especialidade" style="padding: 0.7rem; border: 1px solid #ddd; border-radius: 8px; width: 100%;">
+              <option value="">Todas</option>
+              <option value="massagem">Massagem</option>
+              <option value="estetica">Estética</option>
+              <option value="psicologia">Psicologia</option>
+              <option value="nutricao">Nutrição</option>
+              <option value="fisioterapia">Fisioterapia</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- RESULTADOS -->
+      <section class="dashboard-card">
+        <div class="card-header">
+          <h2 class="card-title"><i class="fas fa-list"></i> Resultados da Busca</h2>
+          <span class="badge">0 encontrados</span>
+        </div>
+        <div id="lista" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.5rem; padding: 1.5rem;"></div>
+        <div id="no-results" class="empty-state">
+          <i class="fas fa-search"></i>
+          <h3>Nenhum resultado encontrado</h3>
+          <p>Tente ajustar os filtros de busca</p>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    document.getElementById('busca').addEventListener('input', filtrarResultados);
+    document.getElementById('tipo').addEventListener('change', filtrarResultados);
+    document.getElementById('especialidade').addEventListener('change', filtrarResultados);
+
+    function filtrarResultados() {
+      console.log('Filtrando resultados...');
+    }
+  </script>
+</body>
+</html>

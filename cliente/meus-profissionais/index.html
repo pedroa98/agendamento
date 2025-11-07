@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Meus Profissionais - Cliente</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="../../css/animations.css">
+  <link rel="stylesheet" href="../../css/sidebar.css">
+  <link rel="stylesheet" href="../../css/dashboard-modern.css">
+  <script src="https://unpkg.com/parse/dist/parse.min.js"></script>
+  <script src="../../js/path-helper.js"></script>
+  <script src="../../js/auth.js" defer></script>
+  <script src="../../js/loader.js"></script>
+  <script src="../../js/sidebar.js" defer></script>
+</head>
+
+<body>
+  <div id="loading-overlay" class="loading-overlay">
+    <div class="spinner"></div>
+  </div>
+
+  <div class="dashboard-container fade-in">
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <h2><i class="fas fa-heart-pulse"></i> AutoCuidado</h2>
+        <p class="brand-subtitle">Cliente</p>
+      </div>
+      <nav>
+        <a href="../dashboard/" class="menu-btn"><i class="fas fa-home"></i> <span>Dashboard</span></a>
+        <a href="../lista-servicos/" class="menu-btn"><i class="fas fa-search"></i> <span>Buscar Serviços</span></a>
+        <a href="../meus-profissionais/" class="menu-btn active"><i class="fas fa-user-md"></i> <span>Meus Profissionais</span></a>
+        <a href="../agenda/" class="menu-btn"><i class="fas fa-calendar-alt"></i> <span>Minha Agenda</span></a>
+        <a href="../editar-perfil/" class="menu-btn"><i class="fas fa-user-edit"></i> <span>Editar Perfil</span></a>
+        <a href="../../login.html" class="menu-btn logout"><i class="fas fa-sign-out-alt"></i> <span>Sair</span></a>
+      </nav>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+      <h1><i class="fas fa-user-md"></i> Meus Profissionais</h1>
+      <p class="page-subtitle">Gerencie seus profissionais favoritos e agendamentos</p>
+
+      <!-- FAVORITOS -->
+      <section class="dashboard-card">
+        <div class="card-header">
+          <h2 class="card-title"><i class="fas fa-star"></i> Profissionais Favoritos</h2>
+          <button class="btn btn-primary btn-sm" onclick="window.location.href='../lista-servicos/'">
+            <i class="fas fa-plus"></i> Buscar Novos
+          </button>
+        </div>
+        <div id="favoritos-list" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem; padding: 1.5rem;"></div>
+        <div id="no-favoritos" class="empty-state">
+          <i class="fas fa-heart"></i>
+          <h3>Nenhum profissional favorito</h3>
+          <p>Adicione profissionais aos favoritos para acessá-los rapidamente</p>
+          <button class="btn btn-primary" onclick="window.location.href='../lista-servicos/'">
+            <i class="fas fa-search"></i> Buscar Profissionais
+          </button>
+        </div>
+      </section>
+
+      <!-- HISTÓRICO -->
+      <section class="dashboard-card">
+        <div class="card-header">
+          <h2 class="card-title"><i class="fas fa-history"></i> Últimos Atendimentos</h2>
+        </div>
+        <div class="table-responsive">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th><i class="fas fa-user-md"></i> Profissional</th>
+                <th><i class="fas fa-calendar"></i> Data</th>
+                <th><i class="fas fa-briefcase"></i> Serviço</th>
+                <th><i class="fas fa-star"></i> Avaliação</th>
+                <th><i class="fas fa-cog"></i> Ações</th>
+              </tr>
+            </thead>
+            <tbody id="historico-list">
+              <tr>
+                <td colspan="5" class="text-center" style="padding: 3rem;">
+                  <div class="empty-state">
+                    <i class="fas fa-calendar-times"></i>
+                    <h3>Nenhum atendimento anterior</h3>
+                    <p>Seus atendimentos anteriores aparecerão aqui</p>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    async function carregarProfissionais() {
+      const currentUser = Parse.User.current();
+      if (!currentUser) return;
+
+      try {
+        const Cliente = Parse.Object.extend("Cliente");
+        const query = new Parse.Query(Cliente);
+        query.equalTo("user", currentUser);
+        const cliente = await query.first();
+
+        if (cliente) {
+          const favoritos = cliente.get("profissionaisFavoritos") || [];
+          
+          if (favoritos.length > 0) {
+            document.getElementById('no-favoritos').style.display = 'none';
+            // Carregar dados dos profissionais favoritos
+          }
+        }
+      } catch (error) {
+        console.error("Erro ao carregar profissionais:", error);
+      }
+    }
+
+    window.addEventListener('DOMContentLoaded', carregarProfissionais);
+  </script>
+</body>
+</html>
