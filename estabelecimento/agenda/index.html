@@ -6,50 +6,60 @@
   <title>Agenda do Estabelecimento - AutoCuidado</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <link rel="stylesheet" href="../../css/animations.css">
+  <link rel="stylesheet" href="../../css/sidebar.css">
+  <link rel="stylesheet" href="../../css/dashboard-modern.css">
   <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/main.min.css" rel="stylesheet" />
   <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js"></script>
-  <!-- jsPDF (preload) -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <!-- jsPDF AutoTable -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
   <script src="https://unpkg.com/parse/dist/parse.min.js"></script>
   <script src="../../js/path-helper.js"></script>
   <script src="../../js/auth.js" defer></script>
-  <script src="../../js/loader.js" defer></script>
+  <script src="../../js/loader.js"></script>
+  <script src="../../js/sidebar.js" defer></script>
   <script src="../../js/estabelecimento-agenda.js" defer></script>
   <style>
-    body { margin:0; font-family: 'Poppins', sans-serif; display:flex; min-height:100vh; background:#f4f6f8 }
-    .sidebar { width: 240px; background: #2c3e50; color: #fff; display: flex; flex-direction: column; padding: 20px; }
-    .sidebar a { color: #fff; text-decoration: none; padding: 10px; border-radius: 6px; margin-bottom: 8px; }
-    .sidebar a.active, .sidebar a:hover { background: #3498db; }
-    .main-content{ flex:1; padding:30px }
-    #calendar{ background:white; border-radius:12px; padding:15px; max-width:1000px; margin:0 auto }
+    #calendar{ background:white; border-radius:12px; padding:15px; max-width:1000px; margin:0 auto; box-shadow: 0 1px 3px rgba(0,0,0,0.12); }
   </style>
 </head>
 <body>
-  <div id="loading-overlay">
+  <div id="loading-overlay" class="loading-overlay">
     <div class="spinner"></div>
   </div>
   
-  <div class="sidebar">
-    <h2>AutoCuidado</h2>
-    <a href="../dashboard/"><i class="fas fa-home"></i> Dashboard</a>
-    <a href="../meus-clientes/"><i class="fas fa-users"></i> Meus Clientes</a>
-    <a href="#" class="active"><i class="fas fa-calendar"></i> Minha Agenda</a>
-    <a href="../editar-perfil/"><i class="fas fa-edit"></i> Editar Perfil</a>
-    <a href="../../login.html" onclick="localStorage.clear()"><i class="fas fa-sign-out-alt"></i> Logout</a>
+  <div class="dashboard-container fade-in">
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <h2><i class="fas fa-heart-pulse"></i> AutoCuidado</h2>
+        <p class="brand-subtitle">Estabelecimento</p>
+      </div>
+      <nav>
+        <a href="../dashboard/" class="menu-btn"><i class="fas fa-home"></i> <span>Dashboard</span></a>
+        <a href="../meus-clientes/" class="menu-btn"><i class="fas fa-users"></i> <span>Meus Clientes</span></a>
+        <a href="../interesses/" class="menu-btn"><i class="fas fa-comments"></i> <span>Interessados</span></a>
+        <a href="../agenda/" class="menu-btn"><i class="fas fa-calendar-alt"></i> <span>Agenda</span></a>
+        <a href="../meus-profissionais/" class="menu-btn"><i class="fas fa-user-tie"></i> <span>Profissionais</span></a>
+        <a href="../editar-perfil/" class="menu-btn"><i class="fas fa-user-edit"></i> <span>Editar Perfil</span></a>
+        <a href="../../login.html" class="menu-btn logout"><i class="fas fa-sign-out-alt"></i> <span>Sair</span></a>
+      </nav>
+    </aside>
+
+    <main class="main-content">
+      <h1><i class="fas fa-calendar-alt"></i> Agenda do Estabelecimento</h1>
+      <p class="page-subtitle">Gerencie todos os agendamentos do estabelecimento</p>
+
+      <div class="dashboard-card">
+        <div id="calendar"></div>
+        <div class="btn-bar">
+          <button class="btn-green btn-hover" id="btnAdd"><i class="fas fa-plus"></i> Adicionar Consulta</button>
+          <button class="btn-danger btn-hover" id="btnDel"><i class="fas fa-trash"></i> Apagar Consulta</button>
+          <button class="btn btn-hover" id="btnSchedule"><i class="fas fa-clock"></i> Definir Horários</button>
+          <button class="btn btn-hover" id="btnExport"><i class="fas fa-file-pdf"></i> Exportar Semana em PDF</button>
+        </div>
+      </div>
+    </main>
   </div>
-  <div class="main-content fade-in">
-    <h1>Agenda do Estabelecimento</h1>
-    <div id="calendar"></div>
-    <div class="btn-bar">
-      <button class="btn-green btn-hover" id="btnAdd"><i class="fas fa-plus"></i> Adicionar Consulta</button>
-      <button class="btn-danger btn-hover" id="btnDel"><i class="fas fa-trash"></i> Apagar Consulta</button>
-      <button class="btn btn-hover" id="btnSchedule"><i class="fas fa-clock"></i> Definir Horários</button>
-      <button class="btn btn-hover" id="btnExport"><i class="fas fa-file-pdf"></i> Exportar Semana em PDF</button>
-    </div>
-  </div>
-  <!-- Modais reutilizados podem ser semelhantes aos do profissional-agenda -->
+
   <div class="modal" id="modalAdd" style="display:none">
     <div class="modal-content slide-down">
       <h2>Adicionar Consulta</h2>

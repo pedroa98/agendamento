@@ -4,62 +4,150 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Editar Perfil - Estabelecimento</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <link rel="stylesheet" href="../../css/animations.css">
+  <link rel="stylesheet" href="../../css/sidebar.css">
+  <link rel="stylesheet" href="../../css/dashboard-modern.css">
+  <link rel="stylesheet" href="../../css/form-modern.css">
   <script src="https://unpkg.com/parse/dist/parse.min.js"></script>
   <script src="../../js/path-helper.js"></script>
   <script src="../../js/auth.js" defer></script>
-  <script src="../../js/loader.js" defer></script>
+  <script src="../../js/loader.js"></script>
+  <script src="../../js/sidebar.js" defer></script>
   <script src="../../js/editar-perfil-estabelecimento.js" defer></script>
 </head>
 <body>
-  <div id="loadingOverlay" class="loading-overlay">
+  <div id="loading-overlay" class="loading-overlay">
     <div class="spinner"></div>
   </div>
 
-  <div class="container fade-in">
-    <h2>Editar Perfil - Estabelecimento</h2>
+  <div class="dashboard-container fade-in">
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <h2><i class="fas fa-heart-pulse"></i> AutoCuidado</h2>
+        <p class="brand-subtitle">Estabelecimento</p>
+      </div>
+      <nav>
+        <a href="../dashboard/" class="menu-btn"><i class="fas fa-home"></i> <span>Dashboard</span></a>
+        <a href="../meus-clientes/" class="menu-btn"><i class="fas fa-users"></i> <span>Meus Clientes</span></a>
+        <a href="../interesses/" class="menu-btn"><i class="fas fa-comments"></i> <span>Interessados</span></a>
+        <a href="../agenda/" class="menu-btn"><i class="fas fa-calendar-alt"></i> <span>Agenda</span></a>
+        <a href="../meus-profissionais/" class="menu-btn"><i class="fas fa-user-tie"></i> <span>Profissionais</span></a>
+        <a href="../editar-perfil/" class="menu-btn"><i class="fas fa-user-edit"></i> <span>Editar Perfil</span></a>
+        <a href="../../login.html" class="menu-btn logout"><i class="fas fa-sign-out-alt"></i> <span>Sair</span></a>
+      </nav>
+    </aside>
 
-    <form id="perfilForm">
-      <label><i class="fas fa-building"></i> Nome do Estabelecimento:</label>
-      <input type="text" id="nome" required>
+    <main class="main-content">
+      <h1><i class="fas fa-user-edit"></i> Editar Perfil</h1>
+      <p class="page-subtitle">Atualize as informações do seu estabelecimento</p>
 
-      <label><i class="fas fa-align-left"></i> Descrição / Serviços:</label>
-      <textarea id="descricao" placeholder="Ex: Sala de terapia, estética..."></textarea>
+      <div class="form-container">
+        <form id="perfilForm">
+          <div class="form-group">
+            <label><i class="fas fa-building"></i> Nome do Estabelecimento <span class="required">*</span></label>
+            <input type="text" id="nome" placeholder="Digite o nome do estabelecimento" required>
+          </div>
 
-      <label><i class="fas fa-map-marker-alt"></i> Endereço (obrigatório):</label>
-  <input type="text" id="endereco" required>
+          <div class="form-group">
+            <label><i class="fas fa-align-left"></i> Descrição / Serviços</label>
+            <textarea id="descricao" placeholder="Descreva os serviços oferecidos (ex: Sala de terapia, estética...)"></textarea>
+            <p class="form-help"><i class="fas fa-info-circle"></i> Máximo 500 caracteres</p>
+          </div>
 
-  <label><i class="fas fa-phone"></i> Telefone:</label>
-  <input type="tel" id="telefone" placeholder="(00) 00000-0000">
+          <div class="form-grid-2">
+            <div class="form-group">
+              <label><i class="fas fa-map-marker-alt"></i> Endereço <span class="required">*</span></label>
+              <input type="text" id="endereco" placeholder="Rua, número, bairro, cidade" required>
+            </div>
 
-  <label><i class="fas fa-envelope"></i> E-mail de Contato:</label>
-  <input type="email" id="email" placeholder="contato@exemplo.com">
+            <div class="form-group">
+              <label><i class="fas fa-phone"></i> Telefone</label>
+              <input type="tel" id="telefone" placeholder="(00) 00000-0000">
+            </div>
+          </div>
 
-  <label><i class="fas fa-id-card"></i> CNPJ (opcional):</label>
-  <input type="text" id="cnpj" placeholder="00.000.000/0000-00">
+          <div class="form-grid-2">
+            <div class="form-group">
+              <label><i class="fas fa-envelope"></i> E-mail de Contato</label>
+              <input type="email" id="email" placeholder="contato@exemplo.com">
+            </div>
 
-      <label><i class="fas fa-globe"></i> Atende Online:</label>
-      <select id="online">
-        <option value="true">Sim</option>
-        <option value="false">Não</option>
-      </select>
+            <div class="form-group">
+              <label><i class="fas fa-id-card"></i> CNPJ</label>
+              <input type="text" id="cnpj" placeholder="00.000.000/0000-00">
+            </div>
+          </div>
 
-      <label><i class="fas fa-dollar-sign"></i> Preço Médio (R$):</label>
-      <input type="number" id="preco" min="0" step="0.01">
+          <div class="form-grid-2">
+            <div class="form-group">
+              <label><i class="fas fa-globe"></i> Atende Online</label>
+              <select id="online">
+                <option value="true">Sim</option>
+                <option value="false">Não</option>
+              </select>
+            </div>
 
-      <label><i class="fas fa-image"></i> Foto do Estabelecimento:</label>
-      <input type="file" id="foto" accept="image/*">
-      <img id="previewFoto" alt="Prévia da foto" width="150" style="display:none">
-      <button id="removerFoto" type="button" style="display:none;"><i class="fas fa-trash"></i> Remover Foto</button>
+            <div class="form-group">
+              <label><i class="fas fa-dollar-sign"></i> Preço Médio (R$)</label>
+              <input type="number" id="preco" min="0" step="0.01" placeholder="0.00">
+            </div>
+          </div>
 
-      <button type="submit"><i class="fas fa-save"></i> Salvar</button>
-    </form>
+          <div class="form-group">
+            <label><i class="fas fa-image"></i> Foto do Estabelecimento</label>
+            <div class="file-upload">
+              <input type="file" id="imagemFile" accept="image/*">
+              <label for="imagemFile" class="file-upload-label">
+                <i class="fas fa-cloud-upload-alt"></i>
+                <span>Clique para selecionar uma imagem</span>
+              </label>
+            </div>
+            <div id="imagePreview" class="file-preview" style="display: none;">
+              <img id="previewImg" src="" alt="Preview">
+              <div class="file-preview-info">
+                <div class="file-preview-name" id="fileName">imagem.jpg</div>
+                <div class="file-preview-size" id="fileSize">0 KB</div>
+              </div>
+              <button type="button" class="file-preview-remove" id="removeImage">
+                <i class="fas fa-times"></i>
+              </button>
+            </div>
+            <p class="form-help"><i class="fas fa-info-circle"></i> Formatos aceitos: JPG, PNG. Tamanho máximo: 5MB</p>
+          </div>
 
-    <button id="voltarDashboard" type="button"><i class="fas fa-arrow-left"></i> Voltar ao Dashboard</button>
-    <p id="mensagem"></p>
+          <div class="form-actions">
+            <button type="button" id="voltarDashboard" class="btn-secondary">
+              <i class="fas fa-arrow-left"></i> Voltar
+            </button>
+            <button type="submit" class="btn-primary">
+              <i class="fas fa-save"></i> Salvar Alterações
+            </button>
+          </div>
+        </form>
+      </div>
+    </main>
   </div>
 
+  <script>
+    document.getElementById('imagemFile').addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          document.getElementById('previewImg').src = e.target.result;
+          document.getElementById('fileName').textContent = file.name;
+          document.getElementById('fileSize').textContent = (file.size / 1024).toFixed(2) + ' KB';
+          document.getElementById('imagePreview').style.display = 'flex';
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+
+    document.getElementById('removeImage').addEventListener('click', function() {
+      document.getElementById('imagemFile').value = '';
+      document.getElementById('imagePreview').style.display = 'none';
+    });
+  </script>
 </body>
 </html>

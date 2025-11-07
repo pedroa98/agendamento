@@ -4,28 +4,41 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Interessados - Profissional</title>
-  <link rel="stylesheet" href="../../css/style.css">
-  <link rel="stylesheet" href="../../css/animations.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="../../css/animations.css">
+  <link rel="stylesheet" href="../../css/sidebar.css">
+  <link rel="stylesheet" href="../../css/dashboard-modern.css">
   <script src="https://unpkg.com/parse/dist/parse.min.js"></script>
   <script src="../../js/path-helper.js"></script>
-  <script src="../../js/loader.js"></script>
   <script src="../../js/auth.js" defer></script>
+  <script src="../../js/loader.js"></script>
+  <script src="../../js/sidebar.js" defer></script>
   <script src="../../js/interesses-profissional.js" defer></script>
 
   <style>
-    body { margin: 0; font-family: "Poppins", sans-serif; display: flex; min-height: 100vh; background: #f4f6f8; }
-    .sidebar { width: 240px; background: #2c3e50; color: #fff; display: flex; flex-direction: column; padding: 20px; }
-    .sidebar a { color: #fff; text-decoration: none; padding: 10px; border-radius: 6px; margin-bottom: 8px; }
-    .sidebar a.active, .sidebar a:hover { background: #3498db; }
-    .main-content { flex: 1; padding: 30px; overflow-y: auto; }
+    .interessado-card {
+      background: #fff;
+      border-radius: 12px;
+      padding: 15px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      margin-bottom: 15px;
+      transition: transform 0.2s;
+    }
 
-    .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
-    .btn-back { background: #27ae60; color: white; border: none; border-radius: 6px; padding: 8px 14px; cursor: pointer; transition: background 0.2s; }
-    .btn-back:hover { background: #229954; }
+    .interessado-card:hover {
+      transform: translateY(-2px);
+    }
 
-    .interessado-card { background: #fff; border-radius: 12px; padding: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-bottom: 15px; }
-    .btn { padding: 6px 10px; border: none; border-radius: 6px; cursor: pointer; color: #fff; margin: 3px; }
+    .btn {
+      padding: 8px 12px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      color: #fff;
+      margin: 3px;
+      transition: all 0.3s ease;
+    }
+
     .btn-green { background: #27ae60; }
     .btn-red { background: #e74c3c; }
     .btn-green:hover { background: #219150; }
@@ -34,27 +47,36 @@
 </head>
 
 <body>
-  <div id="loading-overlay">
+  <div id="loading-overlay" class="loading-overlay">
     <div class="spinner"></div>
   </div>
 
-  <div class="sidebar fade-in">
-    <h2>AutoCuidado</h2>
-    <a href="../agenda/" class="stagger-item"><i class="fas fa-calendar-alt"></i> Agenda</a>
-    <a href="../interesses/" class="active stagger-item"><i class="fas fa-comments"></i> Interessados</a>
-    <a href="../meus-clientes/" class="stagger-item"><i class="fas fa-users"></i> Meus Clientes</a>
-    <a href="../editar-perfil/" class="stagger-item"><i class="fas fa-edit"></i> Editar Perfil</a>
-    <a href="../../login.html" onclick="localStorage.clear()" class="stagger-item"><i class="fas fa-sign-out-alt"></i> Logout</a>
-  </div>
-
-  <div class="main-content fade-in">
-    <div class="top-bar">
-      <h1><i class="fas fa-comments"></i> Clientes Interessados</h1>
-      <button class="btn-back" onclick="window.location.href='../dashboard/'"><i class="fas fa-arrow-left"></i> Voltar ao Dashboard</button>
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <h2><i class="fas fa-heart-pulse"></i> AutoCuidado</h2>
+      <p class="brand-subtitle">Profissional</p>
     </div>
+    <nav>
+      <a href="../dashboard/" class="menu-btn"><i class="fas fa-home"></i> <span>Dashboard</span></a>
+      <a href="../meus-clientes/" class="menu-btn"><i class="fas fa-users"></i> <span>Meus Clientes</span></a>
+      <a href="../interesses/" class="menu-btn active"><i class="fas fa-comments"></i> <span>Interessados</span></a>
+      <a href="../agenda/" class="menu-btn"><i class="fas fa-calendar-alt"></i> <span>Agenda</span></a>
+      <a href="../editar-perfil/" class="menu-btn"><i class="fas fa-user-edit"></i> <span>Editar Perfil</span></a>
+      <a href="../../login.html" class="menu-btn logout"><i class="fas fa-sign-out-alt"></i> <span>Sair</span></a>
+    </nav>
+  </aside>
 
-    <div id="listaInteressados" class="stagger-item"></div>
-    <p id="mensagem"></p>
+  <div class="dashboard-container fade-in">
+    <main class="main-content">
+      <div class="page-header">
+        <h1><i class="fas fa-comments"></i> Clientes Interessados</h1>
+      </div>
+
+      <div class="dashboard-card">
+        <div id="listaInteressados"></div>
+        <p id="mensagem"></p>
+      </div>
+    </main>
   </div>
 </body>
 </html>

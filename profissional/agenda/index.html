@@ -4,89 +4,40 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Agenda do Profissional - AutoCuidado</title>
-
-  <!-- Font Awesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-  <!-- Animations CSS -->
   <link rel="stylesheet" href="../../css/animations.css">
+  <link rel="stylesheet" href="../../css/sidebar.css">
+  <link rel="stylesheet" href="../../css/dashboard-modern.css">
+  <script src="https://unpkg.com/parse/dist/parse.min.js"></script>
+  <script src="../../js/path-helper.js"></script>
+  <script src="../../js/auth.js" defer></script>
+  <script src="../../js/loader.js"></script>
+  <script src="../../js/sidebar.js" defer></script>
   
   <!-- FullCalendar -->
   <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/main.min.css" rel="stylesheet" />
   <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js"></script>
 
-  <!-- jsPDF (preload) -->
+  <!-- jsPDF -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <!-- jsPDF AutoTable -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
 
-  <!-- Parse SDK -->
-  <script src="https://unpkg.com/parse/dist/parse.min.js"></script>
-  <script src="../../js/path-helper.js"></script>
-  <script src="../../js/auth.js" defer></script>
-  <script src="../../js/loader.js" defer></script>
   <script src="../../js/profissional-agenda.js" defer></script>
 
   <style>
-    body {
-      margin: 0;
-      font-family: "Poppins", sans-serif;
-      display: flex;
-      min-height: 100vh;
-      background: #f4f6f8;
-    }
-
-    /* ==== MENU LATERAL ==== */
-    .sidebar {
-      width: 240px;
-      background: #2c3e50;
-      color: #fff;
-      display: flex;
-      flex-direction: column;
-      padding: 20px;
-    }
-
-    .sidebar h2 {
-      text-align: center;
-      margin-bottom: 20px;
-    }
-
-    .sidebar a {
-      color: #fff;
-      text-decoration: none;
-      padding: 10px;
-      border-radius: 6px;
-      margin-bottom: 8px;
-      transition: background 0.2s;
-    }
-
-    .sidebar a:hover,
-    .sidebar a.active {
-      background: #3498db;
-    }
-
-    /* ==== CONTEÚDO ==== */
-    .main-content {
-      flex: 1;
-      padding: 30px;
-      overflow-y: auto;
-    }
-
-    h1 {
-      color: #2c3e50;
-      margin-bottom: 20px;
-    }
-
     #calendar {
       background: white;
       border-radius: 12px;
       box-shadow: 0 3px 8px rgba(0,0,0,0.15);
       padding: 10px;
-      max-width: 1000px;
-      margin: 0 auto 20px;
+      margin-bottom: 20px;
     }
 
     .btn-bar {
-      text-align: center;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
       margin-top: 20px;
     }
 
@@ -95,30 +46,18 @@
       color: white;
       border: none;
       padding: 10px 16px;
-      border-radius: 6px;
-      margin: 0 8px;
+      border-radius: 8px;
       cursor: pointer;
       font-size: 15px;
-      transition: background 0.2s;
+      transition: all 0.3s ease;
     }
 
     .btn:hover { background: #2980b9; }
-    .btn-danger { background: #e74c3c; 
-      padding: 10px 16px;
-      border-radius: 6px;
-      margin: 0 8px;
-      cursor: pointer;
-      font-size: 15px;}
+    .btn-danger { background: #e74c3c; }
     .btn-danger:hover { background: #c0392b; }
-    .btn-green { background: #2ecc71; 
-      padding: 10px 16px;
-      border-radius: 6px;
-      margin: 0 8px;
-      cursor: pointer;
-      font-size: 15px;}
+    .btn-green { background: #2ecc71; }
     .btn-green:hover { background: #27ae60; }
 
-    /* ==== MODAL ==== */
     .modal {
       display: none;
       position: fixed;
@@ -151,15 +90,12 @@
       color: #2c3e50;
     }
 
-    /* Schedule form grid */
     #scheduleForm {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
       gap: 10px 20px;
       align-items: center;
     }
-
-    #scheduleForm label { margin: 6px 0; }
 
     .modal-content select, .modal-content input {
       width: 100%;
@@ -168,12 +104,6 @@
       border: 1px solid #ccc;
       margin-top: 5px;
       box-sizing: border-box;
-    }
-
-    @media (max-width: 520px) {
-      #scheduleForm { grid-template-columns: 1fr; }
-      .modal-content { padding: 16px; }
-      .btn { padding: 8px 10px; font-size: 14px; }
     }
 
     .modal-actions {
@@ -193,35 +123,51 @@
     .btn-close { background: #7f8c8d; }
     .btn-close:hover { background: #636e72; }
 
+    @media (max-width: 520px) {
+      #scheduleForm { grid-template-columns: 1fr; }
+      .modal-content { padding: 16px; }
+      .btn { padding: 8px 10px; font-size: 14px; }
+    }
   </style>
 </head>
 <body>
-  <div id="loading-overlay">
+  <div id="loading-overlay" class="loading-overlay">
     <div class="spinner"></div>
   </div>
   
-  <!-- MENU LATERAL -->
-  <div class="sidebar">
-    <h2>AutoCuidado</h2>
-    <a href="../dashboard/"><i class="fas fa-home"></i> Dashboard</a>
-    <a href="../meus-clientes/"><i class="fas fa-users"></i> Meus Clientes</a>
-    <a href="../agenda/" class="active"><i class="fas fa-calendar"></i> Minha Agenda</a>
-    <a href="../editar-perfil/"><i class="fas fa-edit"></i> Editar Perfil</a>
-    <a href="../../login.html" onclick="localStorage.clear()"><i class="fas fa-sign-out-alt"></i> Logout</a>
-  </div>
-
-  <!-- CONTEÚDO PRINCIPAL -->
-  <div class="main-content fade-in">
-    <h1><i class="fas fa-calendar-alt"></i> Agenda do Profissional</h1>
-    <div id="calendar"></div>
-
-    <div class="btn-bar">
-      <button class="btn-green btn-hover" id="btnAdd"><i class="fas fa-plus"></i> Adicionar Consulta</button>
-      <button class="btn-danger btn-hover" id="btnDel"><i class="fas fa-trash"></i> Apagar Consulta</button>
-      <button class="btn btn-hover" id="btnSchedule"><i class="fas fa-clock"></i> Definir Horários de Trabalho</button>
-      <button class="btn btn-hover" id="btnBlocked"><i class="fas fa-ban"></i> Bloquear Datas (Feriados)</button>
-      <button class="btn btn-hover" id="btnExport"><i class="fas fa-file-pdf"></i> Exportar Semana em PDF</button>
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <h2><i class="fas fa-heart-pulse"></i> AutoCuidado</h2>
+      <p class="brand-subtitle">Profissional</p>
     </div>
+    <nav>
+      <a href="../dashboard/" class="menu-btn"><i class="fas fa-home"></i> <span>Dashboard</span></a>
+      <a href="../meus-clientes/" class="menu-btn"><i class="fas fa-users"></i> <span>Meus Clientes</span></a>
+      <a href="../interesses/" class="menu-btn"><i class="fas fa-comments"></i> <span>Interessados</span></a>
+      <a href="../agenda/" class="menu-btn active"><i class="fas fa-calendar-alt"></i> <span>Agenda</span></a>
+      <a href="../editar-perfil/" class="menu-btn"><i class="fas fa-user-edit"></i> <span>Editar Perfil</span></a>
+      <a href="../../login.html" class="menu-btn logout"><i class="fas fa-sign-out-alt"></i> <span>Sair</span></a>
+    </nav>
+  </aside>
+
+  <div class="dashboard-container fade-in">
+    <main class="main-content">
+      <div class="page-header">
+        <h1><i class="fas fa-calendar-alt"></i> Agenda do Profissional</h1>
+      </div>
+
+      <div class="dashboard-card">
+        <div id="calendar"></div>
+
+        <div class="btn-bar">
+          <button class="btn-green btn-hover" id="btnAdd"><i class="fas fa-plus"></i> Adicionar Consulta</button>
+          <button class="btn-danger btn-hover" id="btnDel"><i class="fas fa-trash"></i> Apagar Consulta</button>
+          <button class="btn btn-hover" id="btnSchedule"><i class="fas fa-clock"></i> Definir Horários de Trabalho</button>
+          <button class="btn btn-hover" id="btnBlocked"><i class="fas fa-ban"></i> Bloquear Datas (Feriados)</button>
+          <button class="btn btn-hover" id="btnExport"><i class="fas fa-file-pdf"></i> Exportar Semana em PDF</button>
+        </div>
+      </div>
+    </main>
   </div>
 
   <!-- MODAL ADICIONAR CONSULTA -->
@@ -256,39 +202,39 @@
     </div>
   </div>
 
-    <!-- MODAL HORÁRIOS DE TRABALHO -->
-    <div class="modal" id="modalSchedule">
-      <div class="modal-content slide-down">
-        <h2>Definir Horários de Trabalho</h2>
-        <p>Configure o horário de atendimento por dia da semana.</p>
-        <div id="scheduleForm">
-          <label>Segunda: <input type="time" id="monStart"> até <input type="time" id="monEnd"></label>
-          <label>Terça: <input type="time" id="tueStart"> até <input type="time" id="tueEnd"></label>
-          <label>Quarta: <input type="time" id="wedStart"> até <input type="time" id="wedEnd"></label>
-          <label>Quinta: <input type="time" id="thuStart"> até <input type="time" id="thuEnd"></label>
-          <label>Sexta: <input type="time" id="friStart"> até <input type="time" id="friEnd"></label>
-          <label>Sábado: <input type="time" id="satStart"> até <input type="time" id="satEnd"></label>
-          <label>Domingo: <input type="time" id="sunStart"> até <input type="time" id="sunEnd"></label>
-        </div>
-        <div class="modal-actions">
-          <button class="btn-green btn-hover" id="saveSchedule">Salvar Horários</button>
-          <button class="btn-close btn-hover" id="cancelSchedule">Cancelar</button>
-        </div>
+  <!-- MODAL HORÁRIOS DE TRABALHO -->
+  <div class="modal" id="modalSchedule">
+    <div class="modal-content slide-down">
+      <h2>Definir Horários de Trabalho</h2>
+      <p>Configure o horário de atendimento por dia da semana.</p>
+      <div id="scheduleForm">
+        <label>Segunda: <input type="time" id="monStart"> até <input type="time" id="monEnd"></label>
+        <label>Terça: <input type="time" id="tueStart"> até <input type="time" id="tueEnd"></label>
+        <label>Quarta: <input type="time" id="wedStart"> até <input type="time" id="wedEnd"></label>
+        <label>Quinta: <input type="time" id="thuStart"> até <input type="time" id="thuEnd"></label>
+        <label>Sexta: <input type="time" id="friStart"> até <input type="time" id="friEnd"></label>
+        <label>Sábado: <input type="time" id="satStart"> até <input type="time" id="satEnd"></label>
+        <label>Domingo: <input type="time" id="sunStart"> até <input type="time" id="sunEnd"></label>
+      </div>
+      <div class="modal-actions">
+        <button class="btn-green btn-hover" id="saveSchedule">Salvar Horários</button>
+        <button class="btn-close btn-hover" id="cancelSchedule">Cancelar</button>
       </div>
     </div>
+  </div>
 
-    <!-- MODAL DATAS BLOQUEADAS -->
-    <div class="modal" id="modalBlocked">
-      <div class="modal-content slide-down">
-        <h2>Bloquear Datas</h2>
-        <p>Adicione datas que você não atenderá (feriados, ausências).</p>
-        <label>Nova data: <input type="date" id="blockedDateInput"></label>
-        <button class="btn btn-hover" id="addBlocked">Adicionar</button>
-        <ul id="blockedList"></ul>
-        <div class="modal-actions">
-          <button class="btn-close btn-hover" id="closeBlocked">Fechar</button>
-        </div>
+  <!-- MODAL DATAS BLOQUEADAS -->
+  <div class="modal" id="modalBlocked">
+    <div class="modal-content slide-down">
+      <h2>Bloquear Datas</h2>
+      <p>Adicione datas que você não atenderá (feriados, ausências).</p>
+      <label>Nova data: <input type="date" id="blockedDateInput"></label>
+      <button class="btn btn-hover" id="addBlocked">Adicionar</button>
+      <ul id="blockedList"></ul>
+      <div class="modal-actions">
+        <button class="btn-close btn-hover" id="closeBlocked">Fechar</button>
       </div>
     </div>
+  </div>
 </body>
 </html>
