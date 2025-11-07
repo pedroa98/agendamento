@@ -6,11 +6,13 @@
   <title>Dashboard - Estabelecimento</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <link rel="stylesheet" href="../../css/animations.css">
-  <link rel="stylesheet" href="../../css/dashboard.css">
+  <link rel="stylesheet" href="../../css/sidebar.css">
+  <link rel="stylesheet" href="../../css/dashboard-modern.css">
   <script src="https://unpkg.com/parse/dist/parse.min.js"></script>
   <script src="../../js/path-helper.js"></script>
   <script src="../../js/auth.js"></script>
   <script src="../../js/loader.js"></script>
+  <script src="../../js/sidebar.js" defer></script>
 </head>
 <body>
   <div id="loading-overlay" class="loading-overlay">
@@ -19,39 +21,104 @@
 
   <div class="dashboard-container fade-in">
     <aside class="sidebar">
-      <h2>AutoCuidado</h2>
+      <div class="sidebar-header">
+        <h2><i class="fas fa-heart-pulse"></i> AutoCuidado</h2>
+        <p class="brand-subtitle">Estabelecimento</p>
+      </div>
       <nav>
-        <a href="../meus-clientes/" class="menu-btn stagger-item"><i class="fas fa-users"></i> Meus Clientes</a>
-        <a href="../interesses/" class="menu-btn stagger-item"><i class="fas fa-comments"></i> Interessados</a>
-        <a href="../agenda/" class="menu-btn stagger-item"><i class="fas fa-calendar-alt"></i> Agenda</a>
-        <a href="../editar-perfil/" class="menu-btn stagger-item"><i class="fas fa-user-edit"></i> Editar Perfil</a>
-        <a href="../../login.html" class="menu-btn logout stagger-item"><i class="fas fa-sign-out-alt"></i> Logout</a>
+        <a href="../dashboard/" class="menu-btn"><i class="fas fa-home"></i> <span>Dashboard</span></a>
+        <a href="../meus-clientes/" class="menu-btn"><i class="fas fa-users"></i> <span>Meus Clientes</span></a>
+        <a href="../interesses/" class="menu-btn"><i class="fas fa-comments"></i> <span>Interessados</span></a>
+        <a href="../agenda/" class="menu-btn"><i class="fas fa-calendar-alt"></i> <span>Agenda</span></a>
+        <a href="../meus-profissionais/" class="menu-btn"><i class="fas fa-user-tie"></i> <span>Profissionais</span></a>
+        <a href="../editar-perfil/" class="menu-btn"><i class="fas fa-user-edit"></i> <span>Editar Perfil</span></a>
+        <a href="../../login.html" class="menu-btn logout"><i class="fas fa-sign-out-alt"></i> <span>Sair</span></a>
       </nav>
     </aside>
 
     <main class="main-content">
-      <h1>Meu Painel - Estabelecimento</h1>
+      <h1><i class="fas fa-chart-line"></i> Meu Painel</h1>
+      <p class="page-subtitle">Bem-vindo ao seu dashboard de gerenciamento</p>
 
-      <section id="notifications-area">
-        <h2>Notificações</h2>
-        <div id="notifications-controls">
-          <button id="refresh-notifications">Atualizar</button>
-          <button id="mark-all-read">Marcar todas como lidas</button>
+      <!-- Stats Grid -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-header">
+            <div class="stat-icon">
+              <i class="fas fa-users"></i>
+            </div>
+          </div>
+          <div class="stat-value">0</div>
+          <div class="stat-label">Total de Clientes</div>
+          <div class="stat-change positive">
+            <i class="fas fa-arrow-up"></i> 0% este mês
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-header">
+            <div class="stat-icon">
+              <i class="fas fa-calendar-check"></i>
+            </div>
+          </div>
+          <div class="stat-value">0</div>
+          <div class="stat-label">Agendamentos Hoje</div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-header">
+            <div class="stat-icon">
+              <i class="fas fa-user-tie"></i>
+            </div>
+          </div>
+          <div class="stat-value">0</div>
+          <div class="stat-label">Profissionais</div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-header">
+            <div class="stat-icon">
+              <i class="fas fa-star"></i>
+            </div>
+          </div>
+          <div class="stat-value">5.0</div>
+          <div class="stat-label">Avaliação Média</div>
+        </div>
+      </div>
+
+      <!-- Notifications Section -->
+      <section id="notifications-area" class="dashboard-card">
+        <div class="card-header">
+          <h2 class="card-title"><i class="fas fa-bell"></i> Notificações</h2>
+          <div class="card-actions">
+            <button id="refresh-notifications" class="btn btn-secondary btn-sm">
+              <i class="fas fa-sync-alt"></i> Atualizar
+            </button>
+            <button id="mark-all-read" class="btn btn-primary btn-sm">
+              <i class="fas fa-check-double"></i> Marcar como lidas
+            </button>
+          </div>
         </div>
         <ul id="notifications-list"></ul>
-        <div id="no-notifications" style="display:none">Nenhuma notificação</div>
+        <div id="no-notifications" style="display:none" class="empty-state">
+          <i class="fas fa-bell-slash"></i>
+          <h3>Nenhuma notificação</h3>
+          <p>Você está em dia com tudo!</p>
+        </div>
       </section>
 
-      <!-- AREA DE PROPAGANDA (substitui agenda) -->
-      <section id="ads-area">
-        <h2>Propaganda</h2>
-        <div class="ad-card">
-          <h3>Parceria com ProdutosNaturais</h3>
-          <p>Desconto para clientes do estabelecimento nas compras online.</p>
+      <!-- Advertisement Section -->
+      <section id="ads-area" class="dashboard-card">
+        <div class="card-header">
+          <h2 class="card-title"><i class="fas fa-bullhorn"></i> Destaques</h2>
         </div>
         <div class="ad-card">
-          <h3>Destaque do Mês</h3>
-          <p>Coloque sua promoção aqui! Contate marketing@exemplo.com</p>
+          <h3><i class="fas fa-handshake"></i> Parceria com ProdutosNaturais</h3>
+          <p>Desconto exclusivo para clientes do estabelecimento nas compras online.</p>
+        </div>
+        <div class="ad-card" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+          <h3><i class="fas fa-trophy"></i> Destaque do Mês</h3>
+          <p>Coloque sua promoção aqui! Entre em contato: marketing@exemplo.com</p>
         </div>
       </section>
     </main>
