@@ -1,0 +1,16 @@
+{
+  "name": "AutoCuidado",
+  "short_name": "AutoCuidado",
+  "description": "Plataforma de agendamento de serviços de saúde, beleza e bem-estar",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#667eea",
+  "icons": [
+    {
+      "src": "favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}
