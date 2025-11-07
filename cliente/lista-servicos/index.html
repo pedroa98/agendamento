@@ -14,6 +14,298 @@
   <script src="../../js/loader.js"></script>
   <script src="../../js/sidebar.js" defer></script>
   <script src="../../js/lista-servicos.js" defer></script>
+  <style>
+    .search-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2rem;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .search-stats {
+      display: flex;
+      gap: 2rem;
+      align-items: center;
+    }
+
+    .stat-badge {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 0.5rem 1rem;
+      border-radius: 20px;
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+
+    .filters-container {
+      background: #f8f9fa;
+      padding: 1.5rem;
+      border-radius: 12px;
+      margin-bottom: 1.5rem;
+    }
+
+    .filters-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .input-group label {
+      font-weight: 600;
+      color: #2c3e50;
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .input-group label i {
+      color: #667eea;
+    }
+
+    .input-group input,
+    .input-group select {
+      padding: 0.8rem 1rem;
+      border: 2px solid #e0e0e0;
+      border-radius: 10px;
+      font-size: 1rem;
+      transition: all 0.3s;
+      background: white;
+      font-family: inherit;
+    }
+
+    .input-group input:focus,
+    .input-group select:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    .filter-actions {
+      display: flex;
+      gap: 0.5rem;
+      justify-content: flex-end;
+    }
+
+    .btn-filter {
+      padding: 0.6rem 1.2rem;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.9rem;
+    }
+
+    .btn-filter.primary {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+    }
+
+    .btn-filter.primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+    }
+
+    .btn-filter.secondary {
+      background: white;
+      color: #667eea;
+      border: 2px solid #667eea;
+    }
+
+    .btn-filter.secondary:hover {
+      background: #f8f9fa;
+    }
+
+    .results-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 1.5rem;
+      padding: 1.5rem;
+    }
+
+    .service-card {
+      background: white;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+      transition: all 0.3s;
+      cursor: pointer;
+      border: 2px solid transparent;
+    }
+
+    .service-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+      border-color: #667eea;
+    }
+
+    .service-card-header {
+      position: relative;
+      height: 180px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .service-card-avatar {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      border: 5px solid white;
+      object-fit: cover;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+
+    .service-card-type {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      background: rgba(255, 255, 255, 0.95);
+      padding: 0.4rem 0.8rem;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: #667eea;
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+
+    .service-card-body {
+      padding: 1.5rem;
+    }
+
+    .service-card-title {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: #2c3e50;
+      margin-bottom: 0.5rem;
+      display: -webkit-box;
+      -webkit-line-clamp: 1;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .service-card-specialty {
+      color: #667eea;
+      font-size: 0.9rem;
+      font-weight: 600;
+      margin-bottom: 0.8rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .service-card-description {
+      color: #666;
+      font-size: 0.9rem;
+      line-height: 1.5;
+      margin-bottom: 1rem;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .service-card-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 1rem;
+      border-top: 1px solid #e0e0e0;
+    }
+
+    .service-rating {
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+      color: #ffa500;
+      font-weight: 600;
+    }
+
+    .service-location {
+      color: #888;
+      font-size: 0.85rem;
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+
+    .service-card-actions {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 1rem;
+    }
+
+    .btn-action {
+      flex: 1;
+      padding: 0.7rem;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      font-size: 0.9rem;
+    }
+
+    .btn-action.primary {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+    }
+
+    .btn-action.primary:hover {
+      transform: scale(1.02);
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+    }
+
+    .btn-action.secondary {
+      background: #f8f9fa;
+      color: #667eea;
+    }
+
+    .btn-action.secondary:hover {
+      background: #e9ecef;
+    }
+
+    @media (max-width: 1200px) {
+      .filters-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .filters-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .results-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .search-header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+    }
+  </style>
 </head>
 
 <body>
@@ -40,37 +332,58 @@
 
     <!-- MAIN CONTENT -->
     <main class="main-content">
-      <h1><i class="fas fa-search"></i> Buscar Serviços</h1>
-      <p class="page-subtitle">Encontre profissionais e estabelecimentos próximos a você</p>
+      <div class="search-header">
+        <div>
+          <h1><i class="fas fa-search"></i> Buscar Serviços</h1>
+          <p class="page-subtitle">Encontre profissionais e estabelecimentos próximos a você</p>
+        </div>
+        <div class="search-stats">
+          <span class="stat-badge" id="result-count">
+            <i class="fas fa-list"></i> 0 resultados
+          </span>
+        </div>
+      </div>
 
       <!-- FILTROS -->
       <div class="dashboard-card">
         <div class="card-header">
           <h2 class="card-title"><i class="fas fa-filter"></i> Filtros de Busca</h2>
         </div>
-        <div class="filters-container" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; padding: 1.5rem;">
-          <div class="input-group">
-            <label for="busca"><i class="fas fa-search"></i> Buscar</label>
-            <input type="text" id="busca" placeholder="Nome, especialidade ou serviço..." style="padding: 0.7rem; border: 1px solid #ddd; border-radius: 8px; width: 100%;">
+        <div class="filters-container">
+          <div class="filters-grid">
+            <div class="input-group">
+              <label for="busca"><i class="fas fa-search"></i> Buscar</label>
+              <input type="text" id="busca" placeholder="Digite o nome, especialidade ou serviço...">
+            </div>
+            <div class="input-group">
+              <label for="tipo"><i class="fas fa-users"></i> Tipo</label>
+              <select id="tipo">
+                <option value="">Todos</option>
+                <option value="profissional">Profissional</option>
+                <option value="estabelecimento">Estabelecimento</option>
+              </select>
+            </div>
+            <div class="input-group">
+              <label for="especialidade"><i class="fas fa-briefcase"></i> Especialidade</label>
+              <select id="especialidade">
+                <option value="">Todas</option>
+                <option value="massagem">Massagem</option>
+                <option value="estetica">Estética</option>
+                <option value="psicologia">Psicologia</option>
+                <option value="nutricao">Nutrição</option>
+                <option value="fisioterapia">Fisioterapia</option>
+                <option value="pilates">Pilates</option>
+                <option value="yoga">Yoga</option>
+              </select>
+            </div>
           </div>
-          <div class="input-group">
-            <label for="tipo"><i class="fas fa-filter"></i> Tipo</label>
-            <select id="tipo" style="padding: 0.7rem; border: 1px solid #ddd; border-radius: 8px; width: 100%;">
-              <option value="">Todos</option>
-              <option value="profissional">Profissional</option>
-              <option value="estabelecimento">Estabelecimento</option>
-            </select>
-          </div>
-          <div class="input-group">
-            <label for="especialidade"><i class="fas fa-briefcase"></i> Especialidade</label>
-            <select id="especialidade" style="padding: 0.7rem; border: 1px solid #ddd; border-radius: 8px; width: 100%;">
-              <option value="">Todas</option>
-              <option value="massagem">Massagem</option>
-              <option value="estetica">Estética</option>
-              <option value="psicologia">Psicologia</option>
-              <option value="nutricao">Nutrição</option>
-              <option value="fisioterapia">Fisioterapia</option>
-            </select>
+          <div class="filter-actions">
+            <button class="btn-filter secondary" onclick="limparFiltros()">
+              <i class="fas fa-redo"></i> Limpar Filtros
+            </button>
+            <button class="btn-filter primary" onclick="aplicarFiltros()">
+              <i class="fas fa-search"></i> Buscar
+            </button>
           </div>
         </div>
       </div>
@@ -78,27 +391,178 @@
       <!-- RESULTADOS -->
       <section class="dashboard-card">
         <div class="card-header">
-          <h2 class="card-title"><i class="fas fa-list"></i> Resultados da Busca</h2>
-          <span class="badge">0 encontrados</span>
+          <h2 class="card-title"><i class="fas fa-th-large"></i> Resultados</h2>
         </div>
-        <div id="lista" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.5rem; padding: 1.5rem;"></div>
-        <div id="no-results" class="empty-state">
+        <div id="lista" class="results-grid"></div>
+        <div id="no-results" class="empty-state" style="display: block;">
           <i class="fas fa-search"></i>
           <h3>Nenhum resultado encontrado</h3>
-          <p>Tente ajustar os filtros de busca</p>
+          <p>Use os filtros acima para buscar profissionais e estabelecimentos</p>
         </div>
       </section>
     </main>
   </div>
 
   <script>
-    document.getElementById('busca').addEventListener('input', filtrarResultados);
-    document.getElementById('tipo').addEventListener('change', filtrarResultados);
-    document.getElementById('especialidade').addEventListener('change', filtrarResultados);
+    // Dados de exemplo
+    const servicos = [
+      {
+        id: 1,
+        nome: "Dr. João Silva",
+        tipo: "profissional",
+        especialidade: "massagem",
+        descricao: "Massagem terapêutica e relaxante com 10 anos de experiência",
+        rating: 4.8,
+        reviews: 124,
+        localizacao: "Centro, São Paulo",
+        foto: "https://ui-avatars.com/api/?name=Joao+Silva&size=120&background=667eea&color=fff"
+      },
+      {
+        id: 2,
+        nome: "Clínica Bem-Estar",
+        tipo: "estabelecimento",
+        especialidade: "estetica",
+        descricao: "Centro de estética completo com diversos tratamentos",
+        rating: 4.9,
+        reviews: 256,
+        localizacao: "Jardins, São Paulo",
+        foto: "https://ui-avatars.com/api/?name=Clinica+BemEstar&size=120&background=764ba2&color=fff"
+      },
+      {
+        id: 3,
+        nome: "Dra. Maria Santos",
+        tipo: "profissional",
+        especialidade: "psicologia",
+        descricao: "Psicóloga clínica especializada em terapia cognitivo-comportamental",
+        rating: 5.0,
+        reviews: 89,
+        localizacao: "Pinheiros, São Paulo",
+        foto: "https://ui-avatars.com/api/?name=Maria+Santos&size=120&background=667eea&color=fff"
+      },
+      {
+        id: 4,
+        nome: "Studio Movimento",
+        tipo: "estabelecimento",
+        especialidade: "pilates",
+        descricao: "Aulas de Pilates e Yoga com instrutores certificados",
+        rating: 4.7,
+        reviews: 167,
+        localizacao: "Vila Madalena, São Paulo",
+        foto: "https://ui-avatars.com/api/?name=Studio+Movimento&size=120&background=764ba2&color=fff"
+      },
+      {
+        id: 5,
+        nome: "Nutricionista Ana Costa",
+        tipo: "profissional",
+        especialidade: "nutricao",
+        descricao: "Nutricionista funcional e esportiva",
+        rating: 4.9,
+        reviews: 203,
+        localizacao: "Moema, São Paulo",
+        foto: "https://ui-avatars.com/api/?name=Ana+Costa&size=120&background=667eea&color=fff"
+      }
+    ];
 
-    function filtrarResultados() {
-      console.log('Filtrando resultados...');
+    let resultadosFiltrados = [...servicos];
+
+    function renderizarResultados(lista) {
+      const container = document.getElementById('lista');
+      const noResults = document.getElementById('no-results');
+      const resultCount = document.getElementById('result-count');
+
+      if (lista.length === 0) {
+        container.innerHTML = '';
+        noResults.style.display = 'block';
+        resultCount.innerHTML = '<i class="fas fa-list"></i> 0 resultados';
+        return;
+      }
+
+      noResults.style.display = 'none';
+      resultCount.innerHTML = `<i class="fas fa-list"></i> ${lista.length} resultado${lista.length > 1 ? 's' : ''}`;
+
+      container.innerHTML = lista.map(item => `
+        <div class="service-card">
+          <div class="service-card-header">
+            <img src="${item.foto}" alt="${item.nome}" class="service-card-avatar">
+            <span class="service-card-type">
+              <i class="fas fa-${item.tipo === 'profissional' ? 'user-md' : 'building'}"></i>
+              ${item.tipo === 'profissional' ? 'Profissional' : 'Estabelecimento'}
+            </span>
+          </div>
+          <div class="service-card-body">
+            <h3 class="service-card-title">${item.nome}</h3>
+            <div class="service-card-specialty">
+              <i class="fas fa-briefcase"></i>
+              ${item.especialidade.charAt(0).toUpperCase() + item.especialidade.slice(1)}
+            </div>
+            <p class="service-card-description">${item.descricao}</p>
+            <div class="service-card-footer">
+              <div class="service-rating">
+                <i class="fas fa-star"></i>
+                ${item.rating} (${item.reviews})
+              </div>
+              <div class="service-location">
+                <i class="fas fa-map-marker-alt"></i>
+                ${item.localizacao.split(',')[0]}
+              </div>
+            </div>
+            <div class="service-card-actions">
+              <button class="btn-action primary" onclick="verDetalhes(${item.id})">
+                <i class="fas fa-eye"></i> Ver Perfil
+              </button>
+              <button class="btn-action secondary" onclick="favoritar(${item.id})">
+                <i class="fas fa-heart"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      `).join('');
     }
+
+    function aplicarFiltros() {
+      const busca = document.getElementById('busca').value.toLowerCase();
+      const tipo = document.getElementById('tipo').value;
+      const especialidade = document.getElementById('especialidade').value;
+
+      resultadosFiltrados = servicos.filter(item => {
+        const matchBusca = !busca || 
+          item.nome.toLowerCase().includes(busca) || 
+          item.especialidade.toLowerCase().includes(busca) ||
+          item.descricao.toLowerCase().includes(busca);
+        
+        const matchTipo = !tipo || item.tipo === tipo;
+        const matchEspecialidade = !especialidade || item.especialidade === especialidade;
+
+        return matchBusca && matchTipo && matchEspecialidade;
+      });
+
+      renderizarResultados(resultadosFiltrados);
+    }
+
+    function limparFiltros() {
+      document.getElementById('busca').value = '';
+      document.getElementById('tipo').value = '';
+      document.getElementById('especialidade').value = '';
+      aplicarFiltros();
+    }
+
+    function verDetalhes(id) {
+      alert(`Ver detalhes do serviço ID: ${id}`);
+    }
+
+    function favoritar(id) {
+      alert(`Adicionado aos favoritos! ID: ${id}`);
+    }
+
+    // Event listeners
+    document.getElementById('busca').addEventListener('input', aplicarFiltros);
+    document.getElementById('tipo').addEventListener('change', aplicarFiltros);
+    document.getElementById('especialidade').addEventListener('change', aplicarFiltros);
+
+    // Carregar resultados iniciais
+    window.addEventListener('DOMContentLoaded', () => {
+      renderizarResultados(servicos);
+    });
   </script>
 </body>
 </html>
