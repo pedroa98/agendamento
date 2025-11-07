@@ -5,7 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Interessados - Profissional</title>
   <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="../../css/animations.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <script src="https://unpkg.com/parse/dist/parse.min.js"></script>
+  <script src="../../js/loader.js"></script>
   <script src="../../js/auth.js" defer></script>
   <script src="../../js/interesses-profissional.js" defer></script>
 
@@ -30,22 +33,26 @@
 </head>
 
 <body>
-  <div class="sidebar">
-    <h2>AutoCuidado</h2>
-    <a href="../agenda/">📅 Agenda</a>
-    <a href="../interesses/" class="active">💬 Interessados</a>
-    <a href="../meus-clientes/">👥 Meus Clientes</a>
-    <a href="../editar-perfil/">✏️ Editar Perfil</a>
-    <a href="../../login.html" onclick="localStorage.clear()">🚪 Logout</a>
+  <div id="loading-overlay">
+    <div class="spinner"></div>
   </div>
 
-  <div class="main-content">
+  <div class="sidebar fade-in">
+    <h2>AutoCuidado</h2>
+    <a href="../agenda/" class="stagger-item"><i class="fas fa-calendar-alt"></i> Agenda</a>
+    <a href="../interesses/" class="active stagger-item"><i class="fas fa-comments"></i> Interessados</a>
+    <a href="../meus-clientes/" class="stagger-item"><i class="fas fa-users"></i> Meus Clientes</a>
+    <a href="../editar-perfil/" class="stagger-item"><i class="fas fa-edit"></i> Editar Perfil</a>
+    <a href="../../login.html" onclick="localStorage.clear()" class="stagger-item"><i class="fas fa-sign-out-alt"></i> Logout</a>
+  </div>
+
+  <div class="main-content fade-in">
     <div class="top-bar">
-      <h1>💬 Clientes Interessados</h1>
-      <button class="btn-back" onclick="window.location.href='../dashboard/'">⬅️ Voltar ao Dashboard</button>
+      <h1><i class="fas fa-comments"></i> Clientes Interessados</h1>
+      <button class="btn-back" onclick="window.location.href='../dashboard/'"><i class="fas fa-arrow-left"></i> Voltar ao Dashboard</button>
     </div>
 
-    <div id="listaInteressados"></div>
+    <div id="listaInteressados" class="stagger-item"></div>
     <p id="mensagem"></p>
   </div>
 </body>

@@ -5,7 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Meus Profissionais - AutoCuidado</title>
   <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="../../css/animations.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <script src="https://unpkg.com/parse/dist/parse.min.js"></script>
+  <script src="../../js/loader.js"></script>
   <script src="../../js/auth.js" defer></script>
   <script src="../../js/meus-profissionais.js" defer></script>
 
@@ -148,23 +151,25 @@
   </style>
 </head>
 <body>
-  <!-- ==== MENU LATERAL DO CLIENTE ==== -->
-  <div class="sidebar">
-    <h2>AutoCuidado</h2>
-    <a href="../../cliente/dashboard/">📅 Principal</a>
-    <a href="../../cliente/agenda/">📅 Minha Agenda</a>
-    <a href="../../cliente/lista-servicos/">🔍 Lista de Serviços</a>
-    <a href="../meus-profissionais/" class="active">👨‍⚕️ Meus Profissionais</a>
-    <a href="../../cliente/editar-perfil/">✏️ Editar Perfil</a>
-    <a href="../../login.html" onclick="localStorage.clear()">🚪 Logout</a>
+  <div id="loading-overlay">
+    <div class="spinner"></div>
   </div>
 
-  <!-- ==== CONTEÚDO PRINCIPAL ==== -->
-  <div class="main-content">
-    <button class="btn-back" onclick="window.location.href='../../cliente/dashboard/'">⬅️ Voltar ao Dashboard</button>
-    <h1>👨‍⚕️ Meus Profissionais e Estabelecimentos</h1>
+  <div class="sidebar fade-in">
+    <h2>AutoCuidado</h2>
+    <a href="../../cliente/dashboard/" class="stagger-item"><i class="fas fa-home"></i> Principal</a>
+    <a href="../../cliente/agenda/" class="stagger-item"><i class="fas fa-calendar-alt"></i> Minha Agenda</a>
+    <a href="../../cliente/lista-servicos/" class="stagger-item"><i class="fas fa-search"></i> Lista de Serviços</a>
+    <a href="../meus-profissionais/" class="active stagger-item"><i class="fas fa-user-md"></i> Meus Profissionais</a>
+    <a href="../../cliente/editar-perfil/" class="stagger-item"><i class="fas fa-edit"></i> Editar Perfil</a>
+    <a href="../../login.html" onclick="localStorage.clear()" class="stagger-item"><i class="fas fa-sign-out-alt"></i> Logout</a>
+  </div>
 
-    <div id="listaProfissionais"></div>
+  <div class="main-content fade-in">
+    <button class="btn-back" onclick="window.location.href='../../cliente/dashboard/'"><i class="fas fa-arrow-left"></i> Voltar ao Dashboard</button>
+    <h1><i class="fas fa-user-md"></i> Meus Profissionais e Estabelecimentos</h1>
+
+    <div id="listaProfissionais" class="stagger-item"></div>
     <p id="mensagem"></p>
   </div>
 </body>

@@ -4,9 +4,12 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Editar Perfil - Cliente</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="../../css/animations.css">
   <script src="https://unpkg.com/parse/dist/parse.min.js"></script>
   <script src="../../js/auth.js" defer></script>
+  <script src="../../js/loader.js" defer></script>
   <script src="../../js/editar-perfil-cliente.js" defer></script>
   <style>
     body {
@@ -46,33 +49,37 @@
   </style>
 </head>
 <body>
-  <div class="container">
+  <div id="loadingOverlay" class="loading-overlay">
+    <div class="spinner"></div>
+  </div>
+
+  <div class="container fade-in">
     <h2>Editar Perfil - Cliente</h2>
 
     <form id="perfilForm">
-      <label>Nome:</label>
+      <label><i class="fas fa-user"></i> Nome:</label>
       <input type="text" id="nome" required>
 
-      <label>Telefone:</label>
+      <label><i class="fas fa-phone"></i> Telefone:</label>
       <input type="text" id="telefone">
 
-  <label>E-mail de Contato:</label>
+  <label><i class="fas fa-envelope"></i> E-mail de Contato:</label>
   <input type="email" id="email">
 
-      <label>Data de Nascimento:</label>
+      <label><i class="fas fa-calendar"></i> Data de Nascimento:</label>
       <input type="date" id="nascimento">
 
       <p>Idade: <span id="idade">-</span> anos</p>
 
-      <label>Foto de Perfil:</label>
+      <label><i class="fas fa-image"></i> Foto de Perfil:</label>
       <input type="file" id="foto" accept="image/*">
       <img id="previewFoto" alt="Prévia da foto" width="150">
-      <button id="removerFoto" type="button" style="display:none;">Remover Foto</button>
+      <button id="removerFoto" type="button" style="display:none;"><i class="fas fa-trash"></i> Remover Foto</button>
 
-      <button type="submit">Salvar</button>
+      <button type="submit"><i class="fas fa-save"></i> Salvar</button>
     </form>
 
-    <button id="voltarDashboard" type="button">⬅️ Voltar ao Dashboard</button>
+    <button id="voltarDashboard" type="button"><i class="fas fa-arrow-left"></i> Voltar ao Dashboard</button>
     <p id="mensagem"></p>
   </div>
 </body>

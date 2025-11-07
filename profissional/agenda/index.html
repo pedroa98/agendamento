@@ -5,6 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Agenda do Profissional - AutoCuidado</title>
 
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <!-- Animations CSS -->
+  <link rel="stylesheet" href="../../css/animations.css">
+  
   <!-- FullCalendar -->
   <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/main.min.css" rel="stylesheet" />
   <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js"></script>
@@ -17,6 +22,7 @@
   <!-- Parse SDK -->
   <script src="https://unpkg.com/parse/dist/parse.min.js"></script>
   <script src="../../js/auth.js" defer></script>
+  <script src="../../js/loader.js" defer></script>
   <script src="../../js/profissional-agenda.js" defer></script>
 
   <style>
@@ -189,33 +195,37 @@
   </style>
 </head>
 <body>
+  <div id="loading-overlay">
+    <div class="spinner"></div>
+  </div>
+  
   <!-- MENU LATERAL -->
   <div class="sidebar">
     <h2>AutoCuidado</h2>
-    <a href="../dashboard/">🏠 Dashboard</a>
-    <a href="../meus-clientes/">👥 Meus Clientes</a>
-    <a href="../agenda/" class="active">📅 Minha Agenda</a>
-    <a href="../editar-perfil/">✏️ Editar Perfil</a>
-    <a href="../../login.html" onclick="localStorage.clear()">🚪 Logout</a>
+    <a href="../dashboard/"><i class="fas fa-home"></i> Dashboard</a>
+    <a href="../meus-clientes/"><i class="fas fa-users"></i> Meus Clientes</a>
+    <a href="../agenda/" class="active"><i class="fas fa-calendar"></i> Minha Agenda</a>
+    <a href="../editar-perfil/"><i class="fas fa-edit"></i> Editar Perfil</a>
+    <a href="../../login.html" onclick="localStorage.clear()"><i class="fas fa-sign-out-alt"></i> Logout</a>
   </div>
 
   <!-- CONTEÚDO PRINCIPAL -->
-  <div class="main-content">
-    <h1>📆 Agenda do Profissional</h1>
+  <div class="main-content fade-in">
+    <h1><i class="fas fa-calendar-alt"></i> Agenda do Profissional</h1>
     <div id="calendar"></div>
 
     <div class="btn-bar">
-      <button class="btn-green" id="btnAdd">➕ Adicionar Consulta</button>
-      <button class="btn-danger" id="btnDel">🗑️ Apagar Consulta</button>
-      <button class="btn" id="btnSchedule">🕘 Definir Horários de Trabalho</button>
-      <button class="btn" id="btnBlocked">⛔ Bloquear Datas (Feriados)</button>
-      <button class="btn" id="btnExport">📤 Exportar Semana em PDF</button>
+      <button class="btn-green btn-hover" id="btnAdd"><i class="fas fa-plus"></i> Adicionar Consulta</button>
+      <button class="btn-danger btn-hover" id="btnDel"><i class="fas fa-trash"></i> Apagar Consulta</button>
+      <button class="btn btn-hover" id="btnSchedule"><i class="fas fa-clock"></i> Definir Horários de Trabalho</button>
+      <button class="btn btn-hover" id="btnBlocked"><i class="fas fa-ban"></i> Bloquear Datas (Feriados)</button>
+      <button class="btn btn-hover" id="btnExport"><i class="fas fa-file-pdf"></i> Exportar Semana em PDF</button>
     </div>
   </div>
 
   <!-- MODAL ADICIONAR CONSULTA -->
   <div class="modal" id="modalAdd">
-    <div class="modal-content">
+    <div class="modal-content slide-down">
       <h2>Adicionar Consulta</h2>
       <label>Cliente:</label>
       <select id="clienteSelect"></select>
@@ -226,28 +236,28 @@
       <label><input type="checkbox" id="descontarCredito"> Descontar 1 crédito</label>
 
       <div class="modal-actions">
-        <button class="btn-green" id="salvarConsulta">Salvar</button>
-        <button class="btn-close" id="cancelarAdd">Cancelar</button>
+        <button class="btn-green btn-hover" id="salvarConsulta">Salvar</button>
+        <button class="btn-close btn-hover" id="cancelarAdd">Cancelar</button>
       </div>
     </div>
   </div>
 
   <!-- MODAL EXCLUIR CONSULTA -->
   <div class="modal" id="modalDel">
-    <div class="modal-content">
+    <div class="modal-content slide-down">
       <h2>Excluir Consulta</h2>
       <p id="textoExcluir"></p>
       <label><input type="checkbox" id="devolverCredito"> Devolver crédito ao cliente</label>
       <div class="modal-actions">
-        <button class="btn-danger" id="confirmarDel">Excluir</button>
-        <button class="btn-close" id="cancelarDel">Cancelar</button>
+        <button class="btn-danger btn-hover" id="confirmarDel">Excluir</button>
+        <button class="btn-close btn-hover" id="cancelarDel">Cancelar</button>
       </div>
     </div>
   </div>
 
     <!-- MODAL HORÁRIOS DE TRABALHO -->
     <div class="modal" id="modalSchedule">
-      <div class="modal-content">
+      <div class="modal-content slide-down">
         <h2>Definir Horários de Trabalho</h2>
         <p>Configure o horário de atendimento por dia da semana.</p>
         <div id="scheduleForm">
@@ -260,22 +270,22 @@
           <label>Domingo: <input type="time" id="sunStart"> até <input type="time" id="sunEnd"></label>
         </div>
         <div class="modal-actions">
-          <button class="btn-green" id="saveSchedule">Salvar Horários</button>
-          <button class="btn-close" id="cancelSchedule">Cancelar</button>
+          <button class="btn-green btn-hover" id="saveSchedule">Salvar Horários</button>
+          <button class="btn-close btn-hover" id="cancelSchedule">Cancelar</button>
         </div>
       </div>
     </div>
 
     <!-- MODAL DATAS BLOQUEADAS -->
     <div class="modal" id="modalBlocked">
-      <div class="modal-content">
+      <div class="modal-content slide-down">
         <h2>Bloquear Datas</h2>
         <p>Adicione datas que você não atenderá (feriados, ausências).</p>
         <label>Nova data: <input type="date" id="blockedDateInput"></label>
-        <button class="btn" id="addBlocked">Adicionar</button>
+        <button class="btn btn-hover" id="addBlocked">Adicionar</button>
         <ul id="blockedList"></ul>
         <div class="modal-actions">
-          <button class="btn-close" id="closeBlocked">Fechar</button>
+          <button class="btn-close btn-hover" id="closeBlocked">Fechar</button>
         </div>
       </div>
     </div>

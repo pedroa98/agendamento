@@ -1,17 +1,152 @@
 /* Minimal styles for login/register pages */
-.body, body { font-family: Arial, sans-serif; color: #333; margin: 0; }
+.body, body { 
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+  color: #333; 
+  margin: 0; 
+}
+
 /* Background gradiente: azul -> branco -> verde */
 body {
 	background: linear-gradient(180deg, #1e3a8a 0%, #ffffff 50%, #10b981 100%);
 	min-height: 100vh;
+  position: relative;
 }
-.container { max-width: 420px; margin: 72px auto; background: #fff; padding: 24px; border-radius: 8px; box-shadow: 0 6px 18px rgba(19,39,67,0.08); }
-h2 { margin-top: 0; }
-input, select, button { width: 100%; padding: 10px 12px; margin: 8px 0; box-sizing: border-box; border: 1px solid #dfe6ef; border-radius: 6px; }
-button { background: #2b7cff; color: #fff; border: none; cursor: pointer; }
-button:hover { background: #1a66e6; }
-a { color: #2b7cff; text-decoration: none; }
-#message { margin-top: 12px; font-weight: 600; }
+
+.container { 
+  max-width: 420px; 
+  margin: 72px auto; 
+  background: #fff; 
+  padding: 32px; 
+  border-radius: 16px; 
+  box-shadow: 0 10px 40px rgba(19,39,67,0.12);
+  position: relative;
+  overflow: hidden;
+}
+
+.container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #2b7cff, #764ba2);
+}
+
+.logo-container {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+h2 { 
+  margin-top: 0; 
+  color: #1f2937;
+  font-size: 1.8rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+h3 {
+  color: #6b7280;
+  font-weight: 400;
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+/* Input Groups with Icons */
+.input-group {
+  position: relative;
+  margin: 16px 0;
+}
+
+.input-icon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #9ca3af;
+  font-size: 1.1rem;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.input-group input,
+.input-group select {
+  width: 100%;
+  padding: 12px 12px 12px 45px;
+  box-sizing: border-box;
+  border: 2px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+}
+
+.input-group input:focus,
+.input-group select:focus {
+  border-color: #2b7cff;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(43, 124, 255, 0.1);
+}
+
+input, select, button { 
+  width: 100%; 
+  padding: 12px 16px; 
+  margin: 8px 0; 
+  box-sizing: border-box; 
+  border: 2px solid #e5e7eb; 
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+}
+
+button { 
+  background: linear-gradient(135deg, #2b7cff 0%, #1a66e6 100%); 
+  color: #fff; 
+  border: none; 
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 1.05rem;
+  padding: 14px 16px;
+  margin-top: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+button:hover { 
+  background: linear-gradient(135deg, #1a66e6 0%, #0d4fc4 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px rgba(43, 124, 255, 0.3);
+}
+
+button:active {
+  transform: translateY(0);
+}
+
+a { 
+  color: #2b7cff; 
+  text-decoration: none;
+  transition: color 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+a:hover {
+  color: #1a66e6;
+  text-decoration: underline;
+}
+
+#message { 
+  margin-top: 16px; 
+  font-weight: 600;
+  text-align: center;
+  padding: 12px;
+  border-radius: 8px;
+}
 
 /* Profile / listing cards (lista-servicos) */
 .card, .prof-card {

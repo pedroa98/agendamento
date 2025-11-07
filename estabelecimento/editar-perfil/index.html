@@ -4,52 +4,59 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Editar Perfil - Estabelecimento</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="../../css/animations.css">
   <script src="https://unpkg.com/parse/dist/parse.min.js"></script>
   <script src="../../js/auth.js" defer></script>
+  <script src="../../js/loader.js" defer></script>
   <script src="../../js/editar-perfil-estabelecimento.js" defer></script>
 </head>
 <body>
-  <div class="container">
+  <div id="loadingOverlay" class="loading-overlay">
+    <div class="spinner"></div>
+  </div>
+
+  <div class="container fade-in">
     <h2>Editar Perfil - Estabelecimento</h2>
 
     <form id="perfilForm">
-      <label>Nome do Estabelecimento:</label>
+      <label><i class="fas fa-building"></i> Nome do Estabelecimento:</label>
       <input type="text" id="nome" required>
 
-      <label>Descrição / Serviços:</label>
+      <label><i class="fas fa-align-left"></i> Descrição / Serviços:</label>
       <textarea id="descricao" placeholder="Ex: Sala de terapia, estética..."></textarea>
 
-      <label>Endereço (obrigatório):</label>
+      <label><i class="fas fa-map-marker-alt"></i> Endereço (obrigatório):</label>
   <input type="text" id="endereco" required>
 
-  <label>Telefone:</label>
+  <label><i class="fas fa-phone"></i> Telefone:</label>
   <input type="tel" id="telefone" placeholder="(00) 00000-0000">
 
-  <label>E-mail de Contato:</label>
+  <label><i class="fas fa-envelope"></i> E-mail de Contato:</label>
   <input type="email" id="email" placeholder="contato@exemplo.com">
 
-  <label>CNPJ (opcional):</label>
+  <label><i class="fas fa-id-card"></i> CNPJ (opcional):</label>
   <input type="text" id="cnpj" placeholder="00.000.000/0000-00">
 
-      <label>Atende Online:</label>
+      <label><i class="fas fa-globe"></i> Atende Online:</label>
       <select id="online">
         <option value="true">Sim</option>
         <option value="false">Não</option>
       </select>
 
-      <label>Preço Médio (R$):</label>
+      <label><i class="fas fa-dollar-sign"></i> Preço Médio (R$):</label>
       <input type="number" id="preco" min="0" step="0.01">
 
-      <label>Foto do Estabelecimento:</label>
+      <label><i class="fas fa-image"></i> Foto do Estabelecimento:</label>
       <input type="file" id="foto" accept="image/*">
       <img id="previewFoto" alt="Prévia da foto" width="150" style="display:none">
-      <button id="removerFoto" type="button" style="display:none;">Remover Foto</button>
+      <button id="removerFoto" type="button" style="display:none;"><i class="fas fa-trash"></i> Remover Foto</button>
 
-      <button type="submit">Salvar</button>
+      <button type="submit"><i class="fas fa-save"></i> Salvar</button>
     </form>
 
-    <button id="voltarDashboard" type="button">← Voltar ao Dashboard</button>
+    <button id="voltarDashboard" type="button"><i class="fas fa-arrow-left"></i> Voltar ao Dashboard</button>
     <p id="mensagem"></p>
   </div>
 

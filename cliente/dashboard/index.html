@@ -4,27 +4,31 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Dashboard - Cliente</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="../../css/animations.css">
   <link rel="stylesheet" href="../../css/style.css">
   <link rel="stylesheet" href="../../css/dashboard.css">
-  <!-- FullCalendar removido: não usamos mais agenda na área principal -->
   <script src="https://unpkg.com/parse/dist/parse.min.js"></script>
   <script src="../../js/auth.js" defer></script>
+  <script src="../../js/loader.js"></script>
   <script src="../../js/cliente-dashboard.js" defer></script>
-
-  
 </head>
 
 <body>
-  <div class="dashboard-container">
+  <div id="loading-overlay" class="loading-overlay">
+    <div class="spinner"></div>
+  </div>
+
+  <div class="dashboard-container fade-in">
     <!-- MENU LATERAL -->
     <aside class="sidebar">
       <h2>AutoCuidado</h2>
       <nav>
-        <a href="../../lista-servicos.html" class="menu-btn">🔍 Lista de Serviços</a>
-        <a href="../../meus-profissionais.html" class="menu-btn">👨‍⚕️ Meus Profissionais</a>
-        <a href="../agenda/" class="menu-btn active">📅 Minha Agenda</a>
-        <a href="../editar-perfil/" class="menu-btn">✏️ Editar Perfil</a>
-        <a href="../../login.html" class="menu-btn" onclick="localStorage.clear()">🚪 Sair</a>
+        <a href="../../lista-servicos.html" class="menu-btn stagger-item"><i class="fas fa-search"></i> Lista de Serviços</a>
+        <a href="../../meus-profissionais.html" class="menu-btn stagger-item"><i class="fas fa-user-tie"></i> Meus Profissionais</a>
+        <a href="../agenda/" class="menu-btn active stagger-item"><i class="fas fa-calendar-alt"></i> Minha Agenda</a>
+        <a href="../editar-perfil/" class="menu-btn stagger-item"><i class="fas fa-user-edit"></i> Editar Perfil</a>
+        <a href="../../login.html" class="menu-btn stagger-item" onclick="localStorage.clear()"><i class="fas fa-sign-out-alt"></i> Sair</a>
       </nav>
     </aside>
 
