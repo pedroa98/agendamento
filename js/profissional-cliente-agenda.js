@@ -181,7 +181,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       const btn = document.createElement('button');
       btn.className = 'btn btn-blue';
       btn.textContent = 'Cadastrar Perfil';
-      btn.addEventListener('click', () => window.location.href = 'editar-perfil-cliente.html');
+      btn.addEventListener('click', () => window.location.href = 'cliente/editar-perfil/');
       actions.appendChild(btn);
       perfilEl.appendChild(actions);
       mensagemEl.textContent = 'Você precisa criar seu perfil para solicitar vínculo ou agendar.';

@@ -37,16 +37,16 @@ document.addEventListener('DOMContentLoaded', () => {
       setTimeout(() => {
         switch (role) {
           case 'cliente':
-            window.location.href = 'cliente-dashboard.html';
+            window.location.href = 'cliente/dashboard/';
             break;
           case 'profissional':
-            window.location.href = 'profissional-dashboard.html';
+            window.location.href = 'profissional/dashboard/';
             break;
           case 'estabelecimento':
-            window.location.href = 'estabelecimento-dashboard.html';
+            window.location.href = 'estabelecimento/dashboard/';
             break;
           default:
-            window.location.href = 'cliente-dashboard.html';
+            window.location.href = 'cliente/dashboard/';
         }
       }, 600);
 
@@ -88,16 +88,16 @@ document.addEventListener('DOMContentLoaded', () => {
         setTimeout(() => {
           switch (session.role) {
             case 'cliente':
-              window.location.href = 'cliente-dashboard.html';
+              window.location.href = 'cliente/dashboard/';
               break;
             case 'profissional':
-              window.location.href = 'profissional-dashboard.html';
+              window.location.href = 'profissional/dashboard/';
               break;
             case 'estabelecimento':
-              window.location.href = 'estabelecimento-dashboard.html';
+              window.location.href = 'estabelecimento/dashboard/';
               break;
             default:
-              window.location.href = 'cliente-dashboard.html';
+              window.location.href = 'cliente/dashboard/';
           }
         }, 600);
 

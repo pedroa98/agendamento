@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Interessados - Estabelecimento</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="../../css/animations.css">
+  <link rel="stylesheet" href="../../css/sidebar.css">
+  <link rel="stylesheet" href="../../css/dashboard-modern.css">
+  <script src="https://unpkg.com/parse/dist/parse.min.js"></script>
+  <script src="../../js/path-helper.js"></script>
+  <script src="../../js/auth.js" defer></script>
+  <script src="../../js/loader.js"></script>
+  <script src="../../js/sidebar.js" defer></script>
+  <script src="../../js/interesses-estabelecimento.js" defer></script>
+</head>
+<body>
+  <div id="loading-overlay" class="loading-overlay">
+    <div class="spinner"></div>
+  </div>
+
+  <div class="dashboard-container fade-in">
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <h2><i class="fas fa-heart-pulse"></i> AutoCuidado</h2>
+        <p class="brand-subtitle">Estabelecimento</p>
+      </div>
+      <nav>
+        <a href="../dashboard/" class="menu-btn"><i class="fas fa-home"></i> <span>Dashboard</span></a>
+        <a href="../meus-clientes/" class="menu-btn"><i class="fas fa-users"></i> <span>Meus Clientes</span></a>
+        <a href="../interesses/" class="menu-btn"><i class="fas fa-comments"></i> <span>Interessados</span></a>
+        <a href="../agenda/" class="menu-btn"><i class="fas fa-calendar-alt"></i> <span>Agenda</span></a>
+        <a href="../meus-profissionais/" class="menu-btn"><i class="fas fa-user-tie"></i> <span>Profissionais</span></a>
+        <a href="../editar-perfil/" class="menu-btn"><i class="fas fa-user-edit"></i> <span>Editar Perfil</span></a>
+        <a href="../../login.html" class="menu-btn logout"><i class="fas fa-sign-out-alt"></i> <span>Sair</span></a>
+      </nav>
+    </aside>
+
+    <main class="main-content">
+      <h1><i class="fas fa-comments"></i> Interessados</h1>
+      <p class="page-subtitle">Mensagens e solicitações de vínculo enviadas por clientes</p>
+
+      <section id="notifications-area" class="dashboard-card">
+        <div class="card-header">
+          <h2 class="card-title"><i class="fas fa-bell"></i> Notificações</h2>
+          <div class="card-actions">
+            <button id="refresh-notifications" class="btn btn-secondary btn-sm">
+              <i class="fas fa-sync-alt"></i> Atualizar
+            </button>
+            <button id="mark-all-read" class="btn btn-primary btn-sm">
+              <i class="fas fa-check-double"></i> Marcar como lidas
+            </button>
+          </div>
+        </div>
+        <ul id="notifications-list"></ul>
+        <div id="no-notifications" style="display:none" class="empty-state">
+          <i class="fas fa-bell-slash"></i>
+          <h3>Nenhuma notificação</h3>
+          <p>Você está em dia com tudo!</p>
+        </div>
+      </section>
+
+      <section id="requests-area" class="dashboard-card">
+        <div class="card-header">
+          <h2 class="card-title"><i class="fas fa-envelope"></i> Solicitações de Interesse</h2>
+        </div>
+        <ul id="lista-interesses"></ul>
+        <p id="mensagem"></p>
+      </section>
+
+      <section id="ads-area" class="dashboard-card">
+        <div class="card-header">
+          <h2 class="card-title"><i class="fas fa-bullhorn"></i> Destaques</h2>
+        </div>
+        <div class="ad-card">
+          <h3><i class="fas fa-percentage"></i> Promoção Especial</h3>
+          <p>Coloque anúncios e promoções aqui.</p>
+        </div>
+      </section>
+    </main>
+  </div>
+</body>
+</html>

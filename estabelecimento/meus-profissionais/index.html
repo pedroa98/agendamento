@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Meus Profissionais - AutoCuidado</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="../../css/animations.css">
+  <link rel="stylesheet" href="../../css/sidebar.css">
+  <link rel="stylesheet" href="../../css/dashboard-modern.css">
+  <script src="https://unpkg.com/parse/dist/parse.min.js"></script>
+  <script src="../../js/path-helper.js"></script>
+  <script src="../../js/auth.js" defer></script>
+  <script src="../../js/loader.js"></script>
+  <script src="../../js/sidebar.js" defer></script>
+  <script src="../../js/meus-profissionais.js" defer></script>
+
+  <style>
+    #listaProfissionais {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+      gap: 20px;
+    }
+
+    .prof-card {
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      padding: 20px;
+      text-align: center;
+      transition: transform 0.2s, box-shadow 0.2s;
+      position: relative;
+    }
+
+    .prof-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+
+    .prof-card img {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      object-fit: cover;
+      margin-bottom: 10px;
+    }
+
+    .prof-card h3 {
+      margin: 8px 0 4px;
+      color: #2c3e50;
+    }
+
+    .prof-card p {
+      margin: 2px 0;
+      color: #555;
+    }
+
+    .saldo {
+      background: #e8f5e9;
+      color: #2e7d32;
+      border-radius: 6px;
+      padding: 5px 8px;
+      margin-top: 8px;
+      display: inline-block;
+      font-weight: 500;
+    }
+
+    .btn {
+      display: inline-block;
+      padding: 8px 12px;
+      border: none;
+      border-radius: 6px;
+      background: #3498db;
+      color: white;
+      cursor: pointer;
+      margin-top: 10px;
+      transition: background 0.2s;
+    }
+
+    .btn:hover {
+      background: #2980b9;
+    }
+
+    #mensagem {
+      text-align: center;
+      color: #555;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div id="loading-overlay" class="loading-overlay">
+    <div class="spinner"></div>
+  </div>
+
+  <div class="dashboard-container fade-in">
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <h2><i class="fas fa-heart-pulse"></i> AutoCuidado</h2>
+        <p class="brand-subtitle">Estabelecimento</p>
+      </div>
+      <nav>
+        <a href="../dashboard/" class="menu-btn"><i class="fas fa-home"></i> <span>Dashboard</span></a>
+        <a href="../meus-clientes/" class="menu-btn"><i class="fas fa-users"></i> <span>Meus Clientes</span></a>
+        <a href="../interesses/" class="menu-btn"><i class="fas fa-comments"></i> <span>Interessados</span></a>
+        <a href="../agenda/" class="menu-btn"><i class="fas fa-calendar-alt"></i> <span>Agenda</span></a>
+        <a href="../meus-profissionais/" class="menu-btn"><i class="fas fa-user-tie"></i> <span>Profissionais</span></a>
+        <a href="../editar-perfil/" class="menu-btn"><i class="fas fa-user-edit"></i> <span>Editar Perfil</span></a>
+        <a href="../../login.html" class="menu-btn logout"><i class="fas fa-sign-out-alt"></i> <span>Sair</span></a>
+      </nav>
+    </aside>
+
+    <main class="main-content">
+      <h1><i class="fas fa-user-tie"></i> Meus Profissionais</h1>
+      <p class="page-subtitle">Gerencie os profissionais vinculados ao estabelecimento</p>
+
+      <section class="dashboard-card">
+        <div id="listaProfissionais"></div>
+        <p id="mensagem"></p>
+      </section>
+    </main>
+  </div>
+</body>
+</html>

@@ -4,7 +4,13 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Login - AutoCuidado</title>
+  
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Stylesheets -->
   <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/animations.css">
 
   <!-- Parse SDK -->
   <script src="https://unpkg.com/parse/dist/parse.min.js"></script>
@@ -12,21 +18,43 @@
   <!-- Configuração + inicialização -->
   <script src="js/auth.js" defer></script>
 
+  <!-- Loading & Animations -->
+  <script src="js/loader.js" defer></script>
+
   <!-- Lógica de login -->
   <script src="js/login.js" defer></script>
 </head>
 <body>
-  <div class="container">
-    <h2>Login</h2>
+  <!-- Loading Overlay -->
+  <div class="loading-overlay">
+    <div class="spinner"></div>
+    <div class="loading-text">Carregando...</div>
+  </div>
+
+  <div class="container fade-in">
+    <div class="logo-container">
+      <i class="fas fa-heart-pulse fa-3x" style="color: #2b7cff; margin-bottom: 10px;"></i>
+      <h2><i class="fas fa-sign-in-alt"></i> Login</h2>
+    </div>
     <h3>Bem Vindo a Doclin</h3>
 
     <form id="loginForm">
-      <input type="text" id="username" placeholder="E-mail ou usuário" required>
-      <input type="password" id="password" placeholder="Senha" required>
-      <button type="submit">Entrar</button>
+      <div class="input-group">
+        <i class="fas fa-user input-icon"></i>
+        <input type="text" id="username" placeholder="E-mail ou usuário" required>
+      </div>
+      
+      <div class="input-group">
+        <i class="fas fa-lock input-icon"></i>
+        <input type="password" id="password" placeholder="Senha" required>
+      </div>
+      
+      <button type="submit" class="btn-hover-lift ripple">
+        <i class="fas fa-arrow-right"></i> Entrar
+      </button>
     </form>
 
-    <p>Não tem conta? <a href="register.html">Cadastre-se</a></p>
+    <p>Não tem conta? <a href="register.html"><i class="fas fa-user-plus"></i> Cadastre-se</a></p>
     <p id="message"></p>
   </div>
 </body>

@@ -110,6 +110,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   });
 
   document.getElementById("voltarDashboard").addEventListener("click", () => {
-    window.location.href = "estabelecimento-dashboard.html";
+    window.location.href = "../dashboard/";
   });
 });

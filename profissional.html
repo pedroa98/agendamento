@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Profissional - AutoCuidado</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <link rel="stylesheet" href="css/style.css">
   <script src="https://unpkg.com/parse/dist/parse.min.js"></script>
   <script src="js/auth.js" defer></script>
@@ -214,11 +215,11 @@
   <!-- ==== MENU LATERAL ==== -->
   <div class="sidebar">
     <h2>AutoCuidado</h2>
-    <a href="cliente-dashboard.html">📅 Minha Agenda</a>
-    <a href="lista-servicos.html" class="active">🔍 Lista de Serviços</a>
-    <a href="meus-profissionais.html">👨‍⚕️ Meus Profissionais</a>
-    <a href="editar-perfil-cliente.html">✏️ Editar Perfil</a>
-    <a href="login.html" onclick="localStorage.clear()">🚪 Logout</a>
+    <a href="cliente-dashboard.html"><i class="fas fa-calendar-alt"></i> Minha Agenda</a>
+    <a href="lista-servicos.html" class="active"><i class="fas fa-search"></i> Lista de Serviços</a>
+    <a href="meus-profissionais.html"><i class="fas fa-user-md"></i> Meus Profissionais</a>
+    <a href="editar-perfil-cliente.html"><i class="fas fa-user-edit"></i> Editar Perfil</a>
+    <a href="login.html" onclick="localStorage.clear()"><i class="fas fa-sign-out-alt"></i> Logout</a>
   </div>
 
   <!-- ==== CONTEÚDO PRINCIPAL ==== -->
@@ -227,7 +228,7 @@
       <p>Carregando informações...</p>
     </div>
 
-    <h2 id="titulo-agenda">🗓️ Agenda do Profissional</h2>
+    <h2 id="titulo-agenda"><i class="fas fa-calendar-alt"></i> Agenda do Profissional</h2>
 
     <div id="calendar"></div>
 
@@ -242,7 +243,7 @@
     </div>
 
     <!-- BOTÃO VOLTAR -->
-    <a id="voltar-dashboard" href="cliente-dashboard.html">⬅️ Voltar ao Dashboard</a>
+    <a id="voltar-dashboard" href="cliente-dashboard.html"><i class="fas fa-arrow-left"></i> Voltar ao Dashboard</a>
 
     <p id="mensagem"></p>
   </div>

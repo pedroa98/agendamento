@@ -22,7 +22,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       const btn = document.createElement("button");
       btn.textContent = "Cadastrar Perfil";
       btn.className = "btn-back";
-      btn.onclick = () => window.location.href = "editar-perfil-cliente.html";
+      btn.onclick = () => window.location.href = "cliente/editar-perfil/";
       mensagem.appendChild(document.createElement("br"));
       mensagem.appendChild(btn);
       return;

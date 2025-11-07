@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Editar Perfil - Profissional</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="../../css/animations.css">
+  <link rel="stylesheet" href="../../css/sidebar.css">
+  <link rel="stylesheet" href="../../css/dashboard-modern.css">
+  <script src="https://unpkg.com/parse/dist/parse.min.js"></script>
+  <script src="../../js/path-helper.js"></script>
+  <script src="../../js/auth.js" defer></script>
+  <script src="../../js/loader.js"></script>
+  <script src="../../js/sidebar.js" defer></script>
+  <script src="../../js/editar-perfil-profissional.js" defer></script>
+
+  <style>
+    .profile-form {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      color: #2c3e50;
+      font-weight: 500;
+    }
+
+    .form-group input,
+    .form-group textarea,
+    .form-group select {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      font-family: inherit;
+      transition: border-color 0.3s;
+    }
+
+    .form-group input:focus,
+    .form-group textarea:focus,
+    .form-group select:focus {
+      outline: none;
+      border-color: #3498db;
+    }
+
+    .form-group textarea {
+      resize: vertical;
+      min-height: 100px;
+    }
+
+    .preview-container {
+      text-align: center;
+      margin: 20px 0;
+    }
+
+    #previewFoto {
+      max-width: 150px;
+      border-radius: 50%;
+      margin: 10px 0;
+    }
+
+    .btn-group {
+      display: flex;
+      gap: 10px;
+      margin-top: 20px;
+      justify-content: center;
+    }
+
+    .btn {
+      padding: 12px 24px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 15px;
+    }
+
+    .btn-primary {
+      background: #3498db;
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: #2980b9;
+    }
+
+    .btn-secondary {
+      background: #95a5a6;
+      color: white;
+    }
+
+    .btn-secondary:hover {
+      background: #7f8c8d;
+    }
+
+    .btn-danger {
+      background: #e74c3c;
+      color: white;
+    }
+
+    .btn-danger:hover {
+      background: #c0392b;
+    }
+
+    #mensagem {
+      text-align: center;
+      margin-top: 15px;
+      padding: 10px;
+      border-radius: 8px;
+    }
+  </style>
+</head>
+<body>
+  <div id="loading-overlay" class="loading-overlay">
+    <div class="spinner"></div>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <h2><i class="fas fa-heart-pulse"></i> AutoCuidado</h2>
+      <p class="brand-subtitle">Profissional</p>
+    </div>
+    <nav>
+      <a href="../dashboard/" class="menu-btn"><i class="fas fa-home"></i> <span>Dashboard</span></a>
+      <a href="../meus-clientes/" class="menu-btn"><i class="fas fa-users"></i> <span>Meus Clientes</span></a>
+      <a href="../interesses/" class="menu-btn"><i class="fas fa-comments"></i> <span>Interessados</span></a>
+      <a href="../agenda/" class="menu-btn"><i class="fas fa-calendar-alt"></i> <span>Agenda</span></a>
+      <a href="../editar-perfil/" class="menu-btn active"><i class="fas fa-user-edit"></i> <span>Editar Perfil</span></a>
+      <a href="../../login.html" class="menu-btn logout"><i class="fas fa-sign-out-alt"></i> <span>Sair</span></a>
+    </nav>
+  </aside>
+
+  <div class="dashboard-container fade-in">
+    <main class="main-content">
+      <div class="page-header">
+        <h1><i class="fas fa-user-edit"></i> Editar Perfil - Profissional</h1>
+      </div>
+
+      <div class="dashboard-card">
+        <form id="perfilForm" class="profile-form">
+          <div class="form-group">
+            <label><i class="fas fa-user"></i> Nome:</label>
+            <input type="text" id="nome" required>
+          </div>
+
+          <div class="form-group">
+            <label><i class="fas fa-align-left"></i> Descrição / Especialidade:</label>
+            <textarea id="descricao" placeholder="Ex: Psicólogo clínico"></textarea>
+          </div>
+
+          <div class="form-group">
+            <label><i class="fas fa-user-md"></i> Tipo (ex: Psicólogo, Nutricionista):</label>
+            <input type="text" id="tipo" placeholder="Ex: Psicólogo">
+          </div>
+
+          <div class="form-group">
+            <label><i class="fas fa-envelope"></i> E-mail de Contato:</label>
+            <input type="email" id="email" placeholder="contato@exemplo.com">
+          </div>
+
+          <div class="form-group">
+            <label><i class="fas fa-phone"></i> Telefone:</label>
+            <input type="tel" id="telefone" placeholder="(00) 00000-0000">
+          </div>
+
+          <div class="form-group">
+            <label><i class="fas fa-certificate"></i> Número do Conselho:</label>
+            <input type="text" id="conselho">
+          </div>
+
+          <div class="form-group">
+            <label><i class="fas fa-map-marker-alt"></i> Endereço:</label>
+            <input type="text" id="endereco">
+          </div>
+
+          <div class="form-group">
+            <label><i class="fas fa-globe"></i> Atende Online:</label>
+            <select id="online">
+              <option value="true">Sim</option>
+              <option value="false">Não</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label><i class="fas fa-clinic-medical"></i> Atende Presencial:</label>
+            <select id="presencial">
+              <option value="true">Sim</option>
+              <option value="false">Não</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label><i class="fas fa-dollar-sign"></i> Preço da Consulta (R$):</label>
+            <input type="number" id="preco" min="0" step="0.01">
+          </div>
+
+          <div class="form-group">
+            <label><i class="fas fa-image"></i> Foto de Perfil:</label>
+            <input type="file" id="foto" accept="image/*">
+          </div>
+
+          <div class="preview-container">
+            <img id="previewFoto" alt="Prévia da foto" style="display:none;">
+            <br>
+            <button id="removerFoto" type="button" class="btn btn-danger" style="display:none;">
+              <i class="fas fa-trash"></i> Remover Foto
+            </button>
+          </div>
+
+          <div class="btn-group">
+            <button type="submit" class="btn btn-primary">
+              <i class="fas fa-save"></i> Salvar
+            </button>
+            <button id="voltarDashboard" type="button" class="btn btn-secondary">
+              <i class="fas fa-arrow-left"></i> Voltar ao Dashboard
+            </button>
+          </div>
+        </form>
+
+        <p id="mensagem"></p>
+      </div>
+    </main>
+  </div>
+</body>
+</html>

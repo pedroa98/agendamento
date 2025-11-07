@@ -22,7 +22,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         <p>${est.get('description') || ''}</p>
         <p>📍 ${est.get('address') || 'Endereço não informado'}</p>
         <p>⚠️ Você precisa cadastrar seu perfil antes de se vincular a um estabelecimento.</p>
-        <button class="btn" onclick="window.location.href='editar-perfil-cliente.html'">Cadastrar Perfil</button>
+        <button class="btn" onclick="window.location.href='cliente/editar-perfil/'">Cadastrar Perfil</button>
       `;
       return;
     }
@@ -44,7 +44,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     relQ.equalTo('client', clientProfile);
     const relation = await relQ.first();
     if (relation) {
-      container.innerHTML += `<button class="btn btn-green" onclick="window.location.href='estabelecimento-agenda.html?id=${est.id}'">Ver Agenda</button>`;
+      container.innerHTML += `<button class="btn btn-green" onclick="window.location.href='estabelecimento/agenda/?id=${est.id}'">Ver Agenda</button>`;
     } else {
       container.innerHTML += `
         <textarea id="mensagemInteresse" placeholder="Envie uma mensagem para o estabelecimento"></textarea>

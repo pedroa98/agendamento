@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard - Profissional</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="../../css/animations.css">
+  <link rel="stylesheet" href="../../css/sidebar.css">
+  <link rel="stylesheet" href="../../css/dashboard-modern.css">
+  <script src="https://unpkg.com/parse/dist/parse.min.js"></script>
+  <script src="../../js/path-helper.js"></script>
+  <script src="../../js/auth.js"></script>
+  <script src="../../js/loader.js"></script>
+  <script src="../../js/sidebar.js" defer></script>
+</head>
+<body>
+  <div id="loading-overlay" class="loading-overlay">
+    <div class="spinner"></div>
+  </div>
+
+  <div class="dashboard-container fade-in">
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <h2><i class="fas fa-spa"></i> AutoCuidado</h2>
+        <div class="brand-subtitle">Profissional</div>
+      </div>
+      <nav>
+        <a href="../dashboard/" class="menu-btn active"><i class="fas fa-home"></i><span>Dashboard</span></a>
+        <a href="../meus-clientes/" class="menu-btn"><i class="fas fa-users"></i><span>Meus Clientes</span></a>
+        <a href="../interesses/" class="menu-btn"><i class="fas fa-comments"></i><span>Interessados</span></a>
+        <a href="../agenda/" class="menu-btn"><i class="fas fa-calendar-alt"></i><span>Agenda</span></a>
+        <a href="../editar-perfil/" class="menu-btn"><i class="fas fa-user-edit"></i><span>Editar Perfil</span></a>
+        <a href="../../login.html" class="menu-btn logout"><i class="fas fa-sign-out-alt"></i><span>Logout</span></a>
+      </nav>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+      <h1><i class="fas fa-chart-line"></i> Meu Painel</h1>
+      <p class="page-subtitle">Visão geral da sua atividade profissional</p>
+
+      <!-- STATS GRID -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-header">
+            <div class="stat-icon">
+              <i class="fas fa-users"></i>
+            </div>
+          </div>
+          <div class="stat-value">0</div>
+          <div class="stat-label">Total de Clientes</div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-header">
+            <div class="stat-icon">
+              <i class="fas fa-calendar-check"></i>
+            </div>
+          </div>
+          <div class="stat-value">0</div>
+          <div class="stat-label">Agendamentos Hoje</div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-header">
+            <div class="stat-icon">
+              <i class="fas fa-star"></i>
+            </div>
+          </div>
+          <div class="stat-value">0.0</div>
+          <div class="stat-label">Avaliação Média</div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-header">
+            <div class="stat-icon">
+              <i class="fas fa-briefcase"></i>
+            </div>
+          </div>
+          <div class="stat-value">0</div>
+          <div class="stat-label">Serviços Oferecidos</div>
+        </div>
+      </div>
+
+      <!-- NOTIFICATIONS -->
+      <section class="dashboard-card">
+        <div class="card-header">
+          <h2 class="card-title"><i class="fas fa-bell"></i> Notificações</h2>
+          <div class="card-actions">
+            <button id="refresh-notifications" class="btn btn-secondary btn-sm"><i class="fas fa-sync-alt"></i> Atualizar</button>
+            <button id="mark-all-read" class="btn btn-secondary btn-sm"><i class="fas fa-check-double"></i> Marcar como lidas</button>
+            <button id="remove-read" class="btn btn-secondary btn-sm"><i class="fas fa-trash-alt"></i> Remover lidas</button>
+          </div>
+        </div>
+        <ul id="notifications-list"></ul>
+        <div id="no-notifications" class="empty-state" style="display:none">
+          <i class="fas fa-bell-slash"></i>
+          <h3>Nenhuma notificação</h3>
+          <p>Você está em dia com suas notificações!</p>
+        </div>
+      </section>
+
+      <!-- PROPAGANDA -->
+      <section class="dashboard-card">
+        <div class="card-header">
+          <h2 class="card-title"><i class="fas fa-bullhorn"></i> Destaques</h2>
+        </div>
+        <div class="ad-card">
+          <h3><i class="fas fa-rocket"></i> Oferta para Profissionais</h3>
+          <p>Upgrade: anúncios e destaques para profissionais parceiros.</p>
+        </div>
+        <div class="ad-card">
+          <h3><i class="fas fa-graduation-cap"></i> Curso de Atualização</h3>
+          <p>Curso online com 10% de desconto para usuários ativos.</p>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="../../js/profissional-dashboard.js"></script>
+</body>
+</html>
